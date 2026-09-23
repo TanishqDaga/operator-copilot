@@ -4,7 +4,9 @@ import AlertQueue from '../components/AlertQueue'
 import { AnomalyCompact } from '../components/AnomalyCard'
 import EventList from '../components/EventList'
 import ExplainPanel from '../components/ExplainPanel'
+import OperatorTaskPlanner from '../components/OperatorTaskPlanner'
 import { EtaCard, TaskList } from '../components/TaskCards'
+import TodaySchedule from '../components/TodaySchedule'
 import { Card, CardHeader, Chip, Source, Stat } from '../components/ui'
 import { PHASE_LABEL, fmt } from '../lib/format'
 import { useApp } from '../lib/store'
@@ -13,7 +15,19 @@ import Gate from './Gate'
 const WEATHER_ICON = { clear: Cloud, rain: CloudRain, heat: Sun }
 
 export default function Dashboard() {
-  return <Gate what="tasks, ETAs and live machine state"><DashboardView /></Gate>
+  const { state } = useApp()
+  if (!state) return null
+  if (!state.shift.active) {
+    // the published schedule is visible before the checklist; live telemetry stays locked
+    return (
+      <div className="space-y-5">
+        <Gate what="tasks, ETAs and live machine state" />
+        <OperatorTaskPlanner />
+        <TodaySchedule />
+      </div>
+    )
+  }
+  return <DashboardView />
 }
 
 function DashboardView() {
@@ -21,10 +35,12 @@ function DashboardView() {
   return (
         <div className="space-y-5">
           <AlertQueue />
+          <OperatorTaskPlanner />
           <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
             <EtaCard />
             <MachineCard />
           </div>
+          <TodaySchedule />
           <div className="grid gap-5 xl:grid-cols-3">
             <TaskList />
             <div className="space-y-5">

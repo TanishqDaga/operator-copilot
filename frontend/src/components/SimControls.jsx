@@ -1,4 +1,4 @@
-import { Camera, Cloud, CloudRain, Footprints, Hourglass, ListOrdered, Play, SlidersHorizontal, Sun, Truck, UserX } from 'lucide-react'
+import { Camera, Cloud, CloudRain, Footprints, Gauge, Hourglass, ListOrdered, Play, SlidersHorizontal, Sun, Truck, UserX } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useCamera } from '../lib/camera'
 import { fmt } from '../lib/format'
@@ -160,6 +160,21 @@ export function MachineControls({ only }) {
           <button className="btn btn-ghost btn-md w-full" onClick={() => run('tram')}>
             <Truck size={16} /> Tram / reposition machine
           </button>
+        </div>
+      )}
+      {show('pace') && (
+        <div>
+          <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-ink2"><Gauge size={14} /> Operator pace (demo)</div>
+          <Segmented
+            value={state?.sim_pace || 'normal'}
+            onChange={(v) => run('pace', v)}
+            options={[
+              { value: 'slow', label: 'Slow' },
+              { value: 'normal', label: 'Normal' },
+              { value: 'brisk', label: 'Brisk' },
+            ]}
+          />
+          <p className="mt-2 text-2xs text-ink3">Synthetic input: new cycles run at ×1.15 / ×1.0 / ×0.85 of this operator's normal cycle time. Drives the ETA and the operator task planner's early/late view.</p>
         </div>
       )}
       {show('weather') && (

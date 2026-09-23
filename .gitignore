@@ -3,7 +3,7 @@ frontend/dist/
 __pycache__/
 *.pyc
 models/*.pt
+data/planning.json
 venv/
 .venv/
 .env
-

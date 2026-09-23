@@ -1,3 +1,5 @@
+import { authHeaders } from './session'
+
 async function handle(res) {
   if (!res.ok) {
     let msg = `${res.status}`
@@ -10,12 +12,16 @@ async function handle(res) {
   return res.json()
 }
 
+const send = (method) => (path, body) =>
+  fetch(`/api${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: body === undefined && method === 'DELETE' ? undefined : JSON.stringify(body ?? {}),
+  }).then(handle)
+
 export const api = {
-  get: (path) => fetch(`/api${path}`, { cache: 'no-store' }).then(handle),
-  post: (path, body) =>
-    fetch(`/api${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body ?? {}),
-    }).then(handle),
+  get: (path) => fetch(`/api${path}`, { cache: 'no-store', headers: authHeaders() }).then(handle),
+  post: send('POST'),
+  put: send('PUT'),
+  del: send('DELETE'),
 }

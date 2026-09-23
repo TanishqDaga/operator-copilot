@@ -6,7 +6,7 @@ import { api } from '../lib/api'
 import { useApp } from '../lib/store'
 
 export default function ShiftStart() {
-  const { meta, state, refreshAll } = useApp()
+  const { meta, state, refreshAll, session, schedule } = useApp()
   const nav = useNavigate()
   const [op, setOp] = useState(null)
   const [checked, setChecked] = useState({})
@@ -14,7 +14,7 @@ export default function ShiftStart() {
   const [err, setErr] = useState(null)
   const active = state?.shift?.active
 
-  useEffect(() => { if (meta && !op) setOp(meta.default_operator) }, [meta, op])
+  useEffect(() => { if (meta && !op) setOp(session?.role === 'operator' ? session.id : meta.default_operator) }, [meta, op, session])
 
   const items = meta?.checklist || []
   const groups = useMemo(() => items.reduce((g, c) => ({ ...g, [c.group]: [...(g[c.group] || []), c] }), {}), [items])
@@ -85,6 +85,12 @@ export default function ShiftStart() {
             <div className="mt-4 rounded-xl border border-line bg-panel2 p-3">
               <div className="label">Today's plan</div>
               <div className="mt-1 text-sm text-ink2">{meta?.plan}</div>
+              {schedule?.published ? (
+                <div className="mt-1 text-2xs text-ink2">
+                  Published schedule <span className="num">{schedule.schedule_id}</span>: {schedule.tasks.length} task{schedule.tasks.length === 1 ? '' : 's'} for you
+                  {schedule.tasks[0] ? <>, first <span className="num">{schedule.tasks[0].task_id}</span> at <span className="num">{schedule.tasks[0].start}</span></> : ''}
+                </div>
+              ) : schedule && <div className="mt-1 text-2xs text-ink3">No published schedule yet — the manager's original order will run.</div>}
               <div className="mt-2 flex items-center gap-1.5 text-2xs text-ink3"><Lock size={12} /> Task list and ETAs unlock after the checklist</div>
             </div>
           </Card>

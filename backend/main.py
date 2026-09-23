@@ -22,10 +22,18 @@ import training_rag
 import safety
 from anomaly import AnomalyDetector
 from eta import EtaModel
+from operator_api import create_router as create_operator_router
+from operator_service import OperatorPlannerService
+from planner import CONSTANTS as PLANNER_CONSTANTS
+from planner import SENSITIVITY_LEVELS, SENSITIVITY_PRESETS
+from planning_api import create_router
+from planning_service import PlanningService
+from planning_store import MACHINES
 from simulator import (DATA, DATA_SOURCE, FUEL_TANK_L, MACHINE_ID, OPERATORS, ROOT, START_FUEL_PCT, TASK_TYPES,
-                       LiveSim, ensure_history, load_tasks)
+                       TERRAIN_F, LiveSim, ensure_history, load_tasks)
 from vision import K as VISION_K
 from vision import Vision
+from weather import SCENARIOS
 
 # ================= CONFIG =================
 TICK_S = 1.0
@@ -33,6 +41,7 @@ CYCLE_DRIVER_S = 3.0        # recent cycle time must move this much before the E
 APPROACH_EMA = 0.6          # smoothing of slider-derived approach speed
 MAX_APPROACH_MS = 3.0
 DEFAULT_OPERATOR = "OP-104"
+PACE = {"normal": 1.0, "brisk": 0.85, "slow": 1.15}   # demo: operator pace = cycle-time multiplier
 # ==========================================
 
 CHECKLIST = [
@@ -80,7 +89,10 @@ class Engine:
                     self._cycle_hist[tuple(k)] = (float(g.cycle_s.median()), int(len(g)))
         self.vision = Vision()
         self.lock = threading.RLock()
-        self.tasks = load_tasks()
+        self.planning = PlanningService(self, DEFAULT_OPERATOR)
+        self.operator = OperatorPlannerService(self)   # execution guidance on top of the published schedule
+        # execution order for LiveSim: the published schedule if any, else the manager's original order
+        self.tasks = self.planning.execution_tasks(None) or load_tasks()
         self.plan_name = json.loads((DATA / "tasks.json").read_text(encoding="utf-8"))["shift_plan"]
         self.sim: LiveSim | None = None
         self.shift = {"active": False, "ended": False}
@@ -123,16 +135,25 @@ class Engine:
         if missing:
             raise HTTPException(400, {"message": "Checklist incomplete", "missing": missing})
         with self.lock:
+            tasks = self.planning.execution_tasks(operator_id)
+            if not tasks:
+                raise HTTPException(400, "No tasks planned — the manager must add tasks before the shift can start")
+            self.tasks = tasks
             self._reset_runtime()
             self.sim = LiveSim(operator_id, self.tasks)
             t0 = self.tasks[0]
             self.sim.seed_recent_cycles([self.cycle_baseline(operator_id, t0, "clear")] * 3)
             self.checklist = {"completed_at": hhmmss(self.sim.now()), "items": [c["id"] for c in CHECKLIST]}
             self.shift = {"active": True, "ended": False, "started_at": self.sim.now(), "operator_id": operator_id}
-            self.events = []
+            # planning decisions made before the shift carry over onto this shift's timeline
+            carried = [e for e in self.events if e["kind"] == "planning" and e.get("pre_shift")]
+            self.events = [{**e, "id": i, "pre_shift": False} for i, e in enumerate(carried, 1)]
             self.notes = ""
+            pub = self.planning.store.published
+            plan = (f"published schedule {pub['schedule_id']} ({' → '.join(t['id'] for t in tasks)})" if pub
+                    else f"no published schedule — manager's original order ({' → '.join(t['id'] for t in tasks)})")
             self._log("shift", "INFO", f"Shift started — pre-start checklist complete ({len(CHECKLIST)}/{len(CHECKLIST)})",
-                      detail=f"{OPERATORS[operator_id]['name']} on {MACHINE_ID}")
+                      detail=f"{OPERATORS[operator_id]['name']} on {MACHINE_ID} · running {plan}")
             self.state = self._build_state()
 
     def end_shift(self):
@@ -391,6 +412,13 @@ class Engine:
                     self._log("weather", "INFO", f"Weather changed: {prev} → {value}", weather=value)
             elif action == "tram":
                 sim.request_tram()
+            elif action == "pace":
+                if value not in PACE:
+                    raise HTTPException(400, f"pace must be one of {'|'.join(PACE)}")
+                if PACE[value] != sim.pace:
+                    sim.pace = PACE[value]
+                    self._log("sim", "INFO", f"Operator pace set to {value} (demo)",
+                              detail=f"Synthetic input: new cycles run at ×{PACE[value]:g} of this operator's normal cycle time")
             elif action == "stack_alerts":
                 sim.seatbelt = False
                 sim.start_idle(15)
@@ -434,22 +462,25 @@ class Engine:
                 "llm": {"available": ai.llm_available(), "model": ai.LLM_MODEL if ai.llm_available() else None},
                 "event_count": len(self.events)}
         if sim is None:
-            return {**base, "ts": hhmmss(datetime.now()), "operator_id": None, "task_id": None,
-                    "alerts": {"items": [], "empty": True, "policy": "severity_x_tth_x_confidence_x_context",
-                               "headline": None, "quiet_count": 0, "quiet": None}}
+            out = {**base, "ts": hhmmss(datetime.now()), "operator_id": None, "task_id": None,
+                   "alerts": {"items": [], "empty": True, "policy": "severity_x_tth_x_confidence_x_context",
+                              "headline": None, "quiet_count": 0, "quiet": None}}
+            out["planning"] = self.planning.live_context(out)
+            return out
         t = sim.current_task
         op = OPERATORS[sim.operator_id]
         started = self.shift.get("started_at")
         base["shift"].update({"operator_name": op["name"], "experience_yrs": op["experience_yrs"],
                               "started_at": hhmmss(started) if started else None,
                               "sim_offset_min": round(sim.clock_offset / 60)})
-        return {
+        out = {
             **base,
             "ts": hhmmss(sim.now()), "operator_id": sim.operator_id, "task_id": t["id"] if t else None,
             "rpm": round(sim.rpm), "fuel_pct": round(sim.fuel_pct, 1), "hyd_temp": round(sim.hyd_temp, 1),
             "speed_kmh": round(sim.speed, 1), "swing": sim.swing, "idle": sim.idle, "idle_min": round(sim.idle_min, 1),
             "payload_t": round(sim.payload, 1), "cycle_s": round(sim.last_cycle_s, 1) if sim.last_cycle_s else None,
             "seatbelt": sim.seatbelt, "weather": sim.weather,
+            "sim_pace": next((k for k, v in PACE.items() if v == sim.pace), "normal"),
             "person": self.person, "safety": self.safety_out, "anomaly": self.anomaly, "eta": self.eta_out,
             "phase": sim.phase, "fuel_rate_lph": round(sim.fuel_rate, 1),
             "task": None if not t else {**t, "label": TASK_TYPES[t["task_type"]]["label"],
@@ -461,6 +492,9 @@ class Engine:
                                   for f, b in self.anom.baselines[sim.operator_id]["idle" if sim.idle else "working"].items()},
             "vision": {**base["vision"], "stale": self.person_source == "camera" and self.vision.reading() is None},
         }
+        # forecast is a first-class context input, alongside (never replacing) the current weather
+        out["planning"] = self.planning.live_context(out)
+        return out
 
     def _alerts_payload(self) -> dict:
         sim = self.sim
@@ -622,6 +656,7 @@ class Engine:
                 "training": self.training_view(),
                 "notes": self.notes,
                 "event_count": len(ev),
+                "operator_productivity": self.operator.shift_summary(),
             }
 
     def meta(self) -> dict:
@@ -633,6 +668,12 @@ class Engine:
             "vision": {"available": self.vision.available, "error": self.vision.error, "K": VISION_K},
             "llm": {"available": ai.llm_available(), "model": ai.LLM_MODEL, "timeout_s": ai.LLM_TIMEOUT_S},
             "fuel_tank_l": FUEL_TANK_L,
+            "machines": MACHINES,
+            "task_types": [{"value": k, "label": v["label"]} for k, v in TASK_TYPES.items()],
+            "terrains": list(TERRAIN_F),
+            "planning": {"sensitivity_levels": SENSITIVITY_LEVELS, "sensitivity_presets": SENSITIVITY_PRESETS,
+                         "scenarios": [{"value": k, "label": v["label"]} for k, v in SCENARIOS.items()],
+                         "constants": PLANNER_CONSTANTS, "shift": self.planning.store.shift},
             "priority": priority.CONSTANTS,
         }
 
@@ -787,6 +828,10 @@ def post_frame(body: FrameIn):
     if not res.get("ok"):
         raise HTTPException(400, res.get("error"))
     return {k: v for k, v in res.items() if k != "t"}
+
+
+app.include_router(create_router(engine))
+app.include_router(create_operator_router(engine))
 
 
 # ---- serve the built frontend (single-command demo) ----

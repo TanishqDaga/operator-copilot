@@ -1,6 +1,7 @@
 import { Activity, CheckCircle2, ClipboardCheck, FileText, GraduationCap, NotebookPen, Power, Printer, ShieldAlert, Timer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { OperatorProductivitySummary } from '../components/ProductivityMetrics'
 import { Card, CardHeader, Chip, KV, LevelPill, PageHeader, Source, SyntheticTag } from '../components/ui'
 import { api } from '../lib/api'
 import { ANOMALY_LABEL, REASON_LABEL, fmt } from '../lib/format'
@@ -68,6 +69,8 @@ export default function Summary() {
           <Source>
             Idle fuel = idle minutes × {s.idle.burn_lph} L/h (mean of {s.idle.burn_n.toLocaleString()} historical idle samples) ÷ 60. Fuel used from tank-level change × {s.fuel.tank_l} L tank. All values from synthetic data.
           </Source>
+
+          <OperatorProductivitySummary s={s.operator_productivity} />
 
           <div className="grid gap-5 xl:grid-cols-2">
             <Card>

@@ -190,6 +190,12 @@ class LiveSim:
         self.last_cycle_s: float | None = None
         self.recent_cycles: deque = deque(maxlen=5)
         self.finished = False
+        self.pace = 1.0              # demo control: cycle-time multiplier (1.0 = this operator's normal pace)
+        # time accounting for the operator productivity view (seconds; fast-forwarded idle included)
+        self.time_s = {"working": 0.0, "travel": 0.0, "idle": 0.0}
+        self.task_time_s: dict[str, dict[str, float]] = {}
+        self.idle_task: str | None = None
+        self.idle_progress: float | None = None
         t = self.current_task
         if t:
             self.task_started[t["id"]] = self.now()
@@ -223,8 +229,11 @@ class LiveSim:
         if not self.idle:
             self.idle = True
             self.idle_since = self.now()
+            self.idle_task = self.current_task["id"] if self.current_task else None
+            self.idle_progress = (self.moved_t[self.idle_task] / self.current_task["tonnes"]) if self.idle_task else None
         skip = max(float(minutes), 0.0)
         self.clock_offset += skip * 60.0
+        self._account("idle", skip * 60.0, self.idle_task)
         self.fuel_pct -= IDLE_FUEL_LPH * (skip / 60.0) / FUEL_TANK_L * 100.0
         self.hyd_temp = HYD_IDLE_C + WEATHER_HYD[self.weather]
 
@@ -232,7 +241,8 @@ class LiveSim:
         if not self.idle:
             return 0.0
         dur = self.idle_min
-        self.idle_log.append({"start": self.idle_since.strftime("%H:%M:%S"), "minutes": round(dur, 1)})
+        self.idle_log.append({"start": self.idle_since.strftime("%H:%M:%S"), "minutes": round(dur, 1),
+                              "task_id": self.idle_task, "progress": self.idle_progress})
         self.idle = False
         self.idle_since = None
         self._new_cycle()
@@ -241,13 +251,29 @@ class LiveSim:
     def request_tram(self):
         self.tram_requested = True
 
+    def reorder_pending(self, order: list[dict]):
+        """Replace the not-yet-started tail with `order` (minus anything already done/active).
+        Done and active tasks, task_idx, moved_t, task_started and task_finished are left untouched.
+        Mutates self.tasks in place so the Engine's reference to the same list stays valid."""
+        keep = self.tasks[: self.task_idx + (1 if self.current_task else 0)]
+        kept = {t["id"] for t in keep}
+        tail = [t for t in order if t["id"] not in kept]
+        was_finished = self.finished
+        self.tasks[:] = keep + tail
+        for t in tail:
+            self.moved_t.setdefault(t["id"], 0.0)
+        if was_finished and self.current_task:
+            self.finished = False
+            self.task_started[self.current_task["id"]] = self.now()
+            self._new_cycle()
+
     # --- internals ---------------------------------------------------------------------
     def _new_cycle(self):
         t = self.current_task
         if not t:
             return
         self.cycle_target = cycle_mean(t["task_type"], t["terrain"], self.weather, self.operator_id) \
-            * self.rng.normal(1, 0.06)
+            * self.rng.normal(1, 0.06) * self.pace
         self.cycle_t = 0.0
         self.phase_i, self.phase_t = 0, 0.0
         self.phase = PHASES[0][0]
@@ -259,7 +285,8 @@ class LiveSim:
         self.last_cycle_s = self.cycle_target
         self.recent_cycles.append(self.cycle_target)
         self.cycles_done += 1
-        self.cycle_log.append({"task_id": t["id"], "cycle_s": self.cycle_target, "payload_t": pay})
+        self.cycle_log.append({"task_id": t["id"], "cycle_s": self.cycle_target, "payload_t": pay,
+                               "weather": self.weather})
         self.moved_t[t["id"]] += pay
         if self.moved_t[t["id"]] >= t["tonnes"]:
             self.moved_t[t["id"]] = float(t["tonnes"])
@@ -274,8 +301,14 @@ class LiveSim:
             self.tram_requested = False
         self._new_cycle()
 
+    def _account(self, bucket: str, seconds: float, task_id: str | None):
+        self.time_s[bucket] += seconds
+        if task_id:
+            self.task_time_s.setdefault(task_id, {"working": 0.0, "travel": 0.0, "idle": 0.0})[bucket] += seconds
+
     def tick(self, dt: float) -> dict:
         events = {}
+        tid = self.current_task["id"] if self.current_task else None
         if self.finished:
             self.idle = False
         if self.idle or self.finished:
@@ -314,6 +347,8 @@ class LiveSim:
                         events["task_done"] = self.tasks[before]["id"]
         self.hyd_temp += (hyd_target - self.hyd_temp) * 0.03 + self.rng.normal(0, 0.05)
         self.fuel_pct -= self.fuel_rate * dt / 3600.0 / FUEL_TANK_L * 100.0
+        bucket = "idle" if (self.idle or self.finished) else "travel" if self.phase == "tram" else "working"
+        self._account(bucket, dt, None if self.finished else tid)
         return events
 
     def features(self) -> dict:

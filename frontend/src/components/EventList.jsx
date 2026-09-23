@@ -1,5 +1,5 @@
 import {
-  Activity, CheckCircle2, CloudRain, FlaskConical, GraduationCap, Info, Link2Off, Loader2, MessageSquareText,
+  Activity, CalendarRange, CheckCircle2, CloudRain, FlaskConical, GraduationCap, Info, Link2Off, Loader2, MessageSquareText,
   OctagonAlert, Play, ShieldCheck, Timer, TriangleAlert,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -10,7 +10,7 @@ import { Chip } from './ui'
 function iconFor(e) {
   if (e.kind === 'safety') return e.level === 'CRITICAL' ? OctagonAlert : e.level === 'WARNING' ? TriangleAlert : ShieldCheck
   return { anomaly: Activity, eta: Timer, weather: CloudRain, seatbelt: Link2Off, notice: Info, task: CheckCircle2,
-    shift: Play, sim: FlaskConical, training: GraduationCap }[e.kind] || Info
+    shift: Play, sim: FlaskConical, training: GraduationCap, planning: CalendarRange }[e.kind] || Info
 }
 
 export default function EventList({ events, compact = false }) {
@@ -54,6 +54,13 @@ function EventRow({ e, compact, last }) {
                 {e.distance_m != null && <Chip><span className="num">{fmt(e.distance_m)} m</span></Chip>}
                 {e.ttc_s != null && e.ttc_s < 60 && <Chip><span className="num">TTC {fmt(e.ttc_s)} s</span></Chip>}
                 {e.speed_kmh > 0 && <Chip><span className="num">{fmt(e.speed_kmh)} km/h</span></Chip>}
+              </div>
+            )}
+            {e.kind === 'planning' && (e.recommended_order || e.estimated_time_saved_min != null) && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {e.original_order && <Chip><span className="num">was {e.original_order.join(' → ')}</span></Chip>}
+                {e.recommended_order && <Chip tone="info"><span className="num">{e.recommended_order.join(' → ')}</span></Chip>}
+                {e.estimated_time_saved_min != null && <Chip tone="safe"><span className="num">est. {e.estimated_time_saved_min} min saved</span></Chip>}
               </div>
             )}
             {e.anomaly_type && e.current != null && (

@@ -10,6 +10,7 @@ const FILTERS = {
   safety: (e) => e.kind === 'safety' || e.kind === 'seatbelt' || e.kind === 'notice',
   anomaly: (e) => e.kind === 'anomaly',
   eta: (e) => e.kind === 'eta' || e.kind === 'task',
+  planning: (e) => e.kind === 'planning',
   other: (e) => ['weather', 'sim', 'shift', 'training'].includes(e.kind),
 }
 
@@ -23,7 +24,7 @@ export default function Timeline() {
   const anom = events.filter((e) => e.kind === 'anomaly' && e.level === 'ANOMALY').length
   return (
     <Gate allowEnded what="the event timeline">
-      <PageHeader title="Event timeline" subtitle="Every safety level change, anomaly, ETA change and site event — logged automatically, newest first." />
+      <PageHeader title="Event timeline" subtitle="Every safety level change, anomaly, ETA change, planning decision and site event — logged automatically, newest first." />
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Tile label="Critical" value={crit} tone="text-crit" />
         <Tile label="Warning" value={warn} tone="text-warn" />
@@ -31,12 +32,13 @@ export default function Timeline() {
         <Tile label="Total events" value={events.length} tone="text-ink" />
       </div>
       <Card>
-        <div className="border-b border-line p-3 md:max-w-2xl">
+        <div className="border-b border-line p-3 md:max-w-3xl">
           <Segmented value={f} onChange={setF} options={[
             { value: 'all', label: `All ${count('all')}` },
             { value: 'safety', label: `Safety ${count('safety')}` },
             { value: 'anomaly', label: `Anomaly ${count('anomaly')}` },
             { value: 'eta', label: `ETA ${count('eta')}` },
+            { value: 'planning', label: `Planning ${count('planning')}` },
             { value: 'other', label: `Other ${count('other')}` },
           ]} />
         </div>
