@@ -60,6 +60,13 @@ class RankTests(unittest.TestCase):
         self.assertLess(train["facts"]["context"], prox["facts"]["context"])
         self.assertLess(train["score"], prox["score"])
 
+    def test_seatbelt_outranks_task_delay(self):
+        r = priority.rank(five_pack())
+        belt = next(i for i in r["items"] if i["id"] == "seatbelt")
+        eta = next(i for i in r["items"] if i["id"] == "eta")
+        self.assertGreater(belt["score"], eta["score"])
+        self.assertLess(r["items"].index(belt), r["items"].index(eta))
+
     def test_eta_not_deduped_with_idle(self):
         r = priority.rank(five_pack())
         self.assertIn("eta", [i["id"] for i in r["items"]])
