@@ -1,10 +1,8 @@
 import {
-  Activity, CalendarRange, CheckCircle2, CloudRain, FlaskConical, GraduationCap, Info, Link2Off, Loader2, MessageSquareText,
+  Activity, CalendarRange, CheckCircle2, CloudRain, FlaskConical, GraduationCap, Info, Link2Off, MessageSquareText,
   OctagonAlert, Play, ShieldCheck, Timer, TriangleAlert,
 } from 'lucide-react'
-import { useState } from 'react'
 import { LEVEL, REASON_LABEL, fmt } from '../lib/format'
-import { useApp } from '../lib/store'
 import { Chip } from './ui'
 
 function iconFor(e) {
@@ -23,15 +21,8 @@ export default function EventList({ events, compact = false }) {
 }
 
 function EventRow({ e, compact, last }) {
-  const { explain } = useApp()
-  const [again, setAgain] = useState(null)
-  const [busy, setBusy] = useState(false)
   const lv = LEVEL[e.level] || LEVEL.INFO
   const Icon = iconFor(e)
-  const run = async () => {
-    setBusy(true)
-    try { setAgain(await explain(e.id)) } finally { setBusy(false) }
-  }
   return (
     <li className="relative flex gap-4 animate-rise">
       {!last && <span className="absolute left-[17px] top-10 bottom-0 w-px bg-line" />}
@@ -69,23 +60,18 @@ function EventRow({ e, compact, last }) {
                 <Chip tone="safe"><span className="num">usual {fmt(e.baseline)} {e.unit}</span></Chip>
               </div>
             )}
-            {(e.explanation || again) && (
+            {e.explanation && (
               <div className="mt-3 rounded-xl border border-line bg-panel2 px-3.5 py-2.5">
                 <div className="flex items-start gap-2.5">
                   <MessageSquareText size={15} className="mt-0.5 shrink-0 text-ink3" />
                   <div className="min-w-0">
-                    <p className="text-sm text-ink2">{again ? again.text : e.explanation}</p>
+                    <p className="text-sm text-ink2">{e.explanation}</p>
                     <span className="text-2xs text-ink3">
-                      {(again?.source || e.explanation_source) === 'llm' ? 'LLM explanation' : 'Template explanation'}
+                      {e.explanation_source === 'llm' ? 'LLM explanation' : 'Template explanation'}
                     </span>
                   </div>
                 </div>
               </div>
-            )}
-            {e.context && (
-              <button className="btn btn-quiet btn-sm mt-2 -ml-2" onClick={run} disabled={busy}>
-                {busy ? <Loader2 size={14} className="animate-spin" /> : <MessageSquareText size={14} />} Explain again
-              </button>
             )}
           </>
         )}
