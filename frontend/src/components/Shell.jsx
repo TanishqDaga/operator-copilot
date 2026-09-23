@@ -22,7 +22,8 @@ const NAV = [
 
 const TITLES = {
   '/start': 'Shift start', '/dashboard': 'Dashboard', '/safety': 'Safety', '/timeline': 'Event timeline',
-  '/anomaly': 'Anomaly', '/training': 'Training hub', '/summary': 'Shift summary & handoff',
+  '/anomaly': 'Anomaly', '/training': 'Training hub', '/training/video': 'Complete Video Guide',
+  '/training/assistant': 'AI Training Assistant', '/summary': 'Shift summary & handoff',
 }
 
 function Logo() {

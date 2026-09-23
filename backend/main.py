@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import ai
+import training_rag
 import safety
 from anomaly import AnomalyDetector
 from eta import EtaModel
@@ -627,6 +628,11 @@ class ExplainIn(BaseModel):
     event_id: int | None = None
 
 
+class TrainingAssistantIn(BaseModel):
+    question: str
+    shift_context: dict = {}
+
+
 class FrameIn(BaseModel):
     image: str
 
@@ -660,6 +666,16 @@ def get_training():
 @app.post("/api/training/book")
 def post_book(body: BookIn):
     return engine.book(body.module_id, body.slot)
+
+
+@app.post("/api/training/assistant")
+def post_training_assistant(body: TrainingAssistantIn):
+    """RAG-based training assistant. Retrieves relevant knowledge chunks and answers
+    via LLM (with template fallback). Completely isolated from other engine logic."""
+    if not body.question or not body.question.strip():
+        raise HTTPException(400, "question must not be empty")
+    live_state = engine.state if engine.sim else {}
+    return training_rag.answer(body.question.strip(), body.shift_context, live_state)
 
 
 @app.post("/api/sim")
