@@ -2,7 +2,7 @@ import { CalendarClock, CheckCircle2, CircleDashed, CloudRain, HelpCircle, MapPi
 import { useState } from 'react'
 import { useApp } from '../lib/store'
 import WeatherImpactBadge, { SensitivityChips } from './WeatherImpactBadge'
-import { Card, CardHeader, Chip, Empty, Source } from './ui'
+import { Card, CardHeader, Chip, Empty } from './ui'
 
 const STATUS = {
   active: { tone: 'cat', label: 'Current' },
@@ -65,10 +65,6 @@ export default function TodaySchedule() {
           )}
         </div>
       )}
-      <Source className="px-5 py-4">
-        Windows are planning estimates from the manager's published plan and a synthetic forecast — not guarantees. Live ETAs for the current
-        task still come from the ETA model. Safety alerts always take priority over schedule recommendations.
-      </Source>
     </Card>
   )
 }

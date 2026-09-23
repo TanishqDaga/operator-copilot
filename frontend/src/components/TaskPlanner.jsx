@@ -2,7 +2,7 @@ import { ListChecks, Lock, MapPin, Pencil, Plus, Trash2 } from 'lucide-react'
 import { DURATION_SOURCE } from '../lib/format'
 import AssignmentSelector from './AssignmentSelector'
 import { MoveBadge, SensitivityChips } from './WeatherImpactBadge'
-import { Card, CardHeader, Chip, Source } from './ui'
+import { Card, CardHeader, Chip } from './ui'
 
 const LIVE = { active: { tone: 'cat', label: 'In progress' }, done: { tone: 'safe', label: 'Done' } }
 
@@ -89,10 +89,6 @@ export default function TaskPlanner({ tasks, original, schedule, operators, mach
           </tbody>
         </table>
       </div>
-      <Source className="px-5 py-4">
-        Duration = manager's planning estimate when set, otherwise the existing RandomForest ETA model (clear weather, assigned operator's
-        experience and historical cycle time). Weather-adjusted durations come from the planner's sensitivity × forecast penalty.
-      </Source>
     </Card>
   )
 }

@@ -17,7 +17,7 @@ const STYLE = {
   },
 }
 
-export default function SafetyBanner({ state, variant = 'hero', meta }) {
+export default function SafetyBanner({ state, variant = 'hero' }) {
   const s = state?.safety || { level: 'SAFE', reasons: [], details: [] }
   const st = STYLE[s.level] || STYLE.SAFE
   const Icon = st.icon
@@ -40,7 +40,7 @@ export default function SafetyBanner({ state, variant = 'hero', meta }) {
         </div>
 
         <div className="min-w-0 flex-1">
-          {s.reasons.length ? (
+          {s.reasons.length > 0 && (
             <ul className="space-y-2">
               {s.details.map((d, i) => (
                 <li key={s.reasons[i] || i} className="flex items-start gap-3 animate-rise">
@@ -51,11 +51,6 @@ export default function SafetyBanner({ state, variant = 'hero', meta }) {
                 </li>
               ))}
             </ul>
-          ) : (
-            <p className="text-sm text-ink2">
-              Monitoring proximity (&lt; {meta?.safety?.D_WARN ?? 8} m / TTC &lt; {meta?.safety?.T_WARN ?? 4} s), seatbelt while moving,
-              wet-ground travel speed and heat. No rule is active.
-            </p>
           )}
           {!hero && (
             <Link to="/safety" className="mt-3 inline-flex text-xs font-semibold text-ink3 hover:text-cat">Open safety view →</Link>

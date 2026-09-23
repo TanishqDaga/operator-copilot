@@ -8,7 +8,7 @@ import ScheduleTimeline from '../components/ScheduleTimeline'
 import TaskEditor from '../components/TaskEditor'
 import TaskPlanner from '../components/TaskPlanner'
 import WeatherForecast, { SyntheticForecastTag } from '../components/WeatherForecast'
-import { Card, CardHeader, Chip, Empty, PageHeader, Source, Stat } from '../components/ui'
+import { Card, CardHeader, Chip, Empty, PageHeader, Stat } from '../components/ui'
 import { PLAN_STATUS, plural } from '../lib/format'
 import { useApp } from '../lib/store'
 
@@ -155,7 +155,6 @@ export default function ManagerDashboard() {
                 {sm.warnings.map((w) => <li key={w} className="flex gap-1.5 text-2xs text-warn"><TriangleAlert size={12} className="mt-px shrink-0" /> {w}</li>)}
               </ul>
             )}
-            <Source className="mt-3">{sm.disclaimer} Forecast-based recommendation, generated {rec.generated_at.replace('T', ' ')}.</Source>
           </div>
         )}
       </Card>

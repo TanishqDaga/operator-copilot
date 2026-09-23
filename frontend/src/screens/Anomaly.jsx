@@ -2,7 +2,7 @@ import { Activity, FlaskConical, ShieldCheck, Table2 } from 'lucide-react'
 import { AnomalyDetail } from '../components/AnomalyCard'
 import EventList from '../components/EventList'
 import { MachineControls } from '../components/SimControls'
-import { Card, CardHeader, PageHeader, Source, SyntheticTag } from '../components/ui'
+import { Card, CardHeader, PageHeader, SyntheticTag } from '../components/ui'
 import { fmt } from '../lib/format'
 import { useApp } from '../lib/store'
 import Gate from './Gate'
@@ -17,7 +17,7 @@ export default function Anomaly() {
 }
 
 function AnomalyView() {
-  const { state, events, meta } = useApp()
+  const { state, events } = useApp()
   const a = state?.anomaly
   const anomEvents = events.filter((e) => e.kind === 'anomaly')
   return (
@@ -41,10 +41,6 @@ function AnomalyView() {
             <Card>
               <CardHeader icon={Table2} title="Live features vs your baseline" subtitle={`${state.operator_id} · ${state.idle ? 'idle' : 'working'} samples`} />
               <FeatureTable />
-              <Source className="px-5 py-4">
-                IsolationForest (one per machine state) trained on {meta?.anomaly?.n_train?.working?.toLocaleString()} working and {meta?.anomaly?.n_train?.idle?.toLocaleString()} idle
-                historical samples (synthetic). Flags when the score stays below the least-typical {Math.round((meta?.anomaly?.score_quantile ?? 0.05) * 100)}% of normal data for {meta?.anomaly?.persist_ticks} s.
-              </Source>
             </Card>
             <div className="space-y-5">
               <Card>

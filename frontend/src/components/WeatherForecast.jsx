@@ -1,7 +1,7 @@
 import { Cloud, CloudDrizzle, CloudFog, CloudRain, CloudSun, Database, Sun, Wind } from 'lucide-react'
 import { CONDITION } from '../lib/format'
 import { useApp } from '../lib/store'
-import { Card, CardHeader, Source } from './ui'
+import { Card, CardHeader } from './ui'
 
 const ICON = { clear: Sun, cloudy: Cloud, rain: CloudRain, wind: Wind, low_visibility: CloudFog }
 const CURRENT_ICON = { clear: CloudSun, rain: CloudDrizzle, heat: Sun }
@@ -78,10 +78,6 @@ export default function WeatherForecast({ forecast, scenarios, onScenario, busy,
           <CurIcon size={13} /> Current (in cab): <span className="text-ink2">{current || 'shift not started'}</span>
         </span>
       </div>
-      <Source className="px-5 py-4">
-        Deterministic synthetic forecast ({forecast.label}, id <span className="num">{forecast.forecast_id}</span>) — no weather API is connected.
-        It drives planning only. The current weather in the cab is set separately from the Simulate panel and drives the ETA model and safety rules.
-      </Source>
     </Card>
   )
 }
