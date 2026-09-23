@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from './api'
+import { loadSession, saveSession } from './session'
 
 const Ctx = createContext(null)
 export const useApp = () => useContext(Ctx)
@@ -32,8 +33,15 @@ export function AppProvider({ children }) {
   const [explanation, setExplanation] = useState(null)
   const [explaining, setExplaining] = useState(false)
   const [simOpen, setSimOpen] = useState(false)
+  const [session, setSession] = useState(loadSession)
+  const [planner, setPlanner] = useState(null)
+  const [schedule, setSchedule] = useState(null)
+  const [operatorPlan, setOperatorPlan] = useState(null)
+  const [plannerLoading, setPlannerLoading] = useState(false)
+  const [plannerError, setPlannerError] = useState(null)
   const lastEventId = useRef(null)
   const prevLevel = useRef('SAFE')
+  const role = session?.role || null
 
   const active = !!state?.shift?.active
   const started = active || !!state?.shift?.ended
@@ -115,11 +123,71 @@ export function AppProvider({ children }) {
 
   const dismissToast = (key) => setToasts((t) => t.filter((x) => x.key !== key))
 
+  // ---- demo session (see session.js — not real authentication) ----
+  const login = useCallback((r, id, name) => {
+    const s = { role: r, id, name }
+    saveSession(s)
+    setSession(s)
+    setPlanner(null)
+    setSchedule(null)
+    setOperatorPlan(null)
+  }, [])
+  const logout = useCallback(() => {
+    saveSession(null)
+    setSession(null)
+    setPlanner(null)
+    setSchedule(null)
+    setOperatorPlan(null)
+  }, [])
+
+  // ---- weather-aware planner: manager sees the whole plan, operator only their published schedule ----
+  const refreshPlanner = useCallback(async () => {
+    try { setPlanner(await api.get('/planner')); setPlannerError(null) } catch (e) { setPlannerError(e.message) }
+  }, [])
+  const refreshSchedule = useCallback(async () => {
+    try { setSchedule(await api.get('/operator/schedule')) } catch { /* offline handled by state poll */ }
+  }, [])
+  usePoll(refreshPlanner, 5000, role === 'manager')
+  usePoll(refreshSchedule, 3000, role === 'operator')
+  // operator task planner: execution guidance on top of the published schedule (read-only)
+  usePoll(async () => {
+    try { setOperatorPlan(await api.get('/operator/planner')) } catch { /* offline handled by state poll */ }
+  }, 2000, role === 'operator')
+
+  const plannerAction = useCallback(async (call) => {
+    setPlannerLoading(true)
+    try {
+      const v = await call()
+      if (v?.tasks) setPlanner(v)
+      return v
+    } finally {
+      setPlannerLoading(false)
+    }
+  }, [])
+  const manager = useMemo(() => ({
+    createTask: (task) => plannerAction(() => api.post('/planner/tasks', task)),
+    updateTask: (id, task) => plannerAction(() => api.put(`/planner/tasks/${id}`, task)),
+    deleteTask: (id) => plannerAction(() => api.del(`/planner/tasks/${id}`)),
+    assign: (taskId, operatorId, machineId) =>
+      plannerAction(() => api.post('/planner/assign', { task_id: taskId, operator_id: operatorId || null, machine_id: machineId || null })),
+    recommend: () => plannerAction(() => api.post('/planner/recommend')),
+    replan: () => plannerAction(() => api.post('/planner/replan')),
+    override: (body) => plannerAction(() => api.post('/planner/override', body)),
+    accept: () => plannerAction(() => api.post('/planner/accept')),
+    publish: () => plannerAction(() => api.post('/planner/publish')),
+    reset: () => plannerAction(() => api.post('/planner/reset')),
+    setScenario: (scenario) => plannerAction(() => api.post('/weather/scenario', { scenario })),
+  }), [plannerAction])
+  const acknowledgeSchedule = useCallback(async () => setSchedule(await api.post('/operator/schedule/ack')), [])
+  const forecast = planner?.forecast || schedule?.forecast || state?.planning?.forecast || null
+
   return (
     <Ctx.Provider
       value={{
         state, meta, events, tasks, online, active, started, toasts, dismissToast,
         explanation, explaining, explain, sim, refreshAll, simOpen, setSimOpen,
+        session, role, login, logout, forecast, planner, schedule, plannerLoading, plannerError,
+        refreshPlanner, refreshSchedule, manager, acknowledgeSchedule, operatorPlan,
       }}
     >
       {children}

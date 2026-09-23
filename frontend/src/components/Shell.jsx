@@ -1,6 +1,6 @@
 import {
-  Activity, ChevronRight, ClipboardCheck, FileText, FlaskConical, GraduationCap, History, LayoutDashboard,
-  OctagonAlert, ShieldAlert, TriangleAlert, Wifi, WifiOff, X,
+  Activity, CalendarRange, ChevronRight, ClipboardCheck, FileText, FlaskConical, GraduationCap, History, LayoutDashboard,
+  LogOut, OctagonAlert, ShieldAlert, TriangleAlert, Wifi, WifiOff, X,
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -10,19 +10,28 @@ import ErrorBoundary from './ErrorBoundary'
 import SimDrawer from './SimDrawer'
 import { LevelPill, SyntheticTag } from './ui'
 
-const NAV = [
-  { to: '/start', label: 'Shift start', icon: ClipboardCheck },
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/safety', label: 'Safety', icon: ShieldAlert, key: 'safety' },
-  { to: '/timeline', label: 'Event timeline', icon: History, key: 'timeline' },
-  { to: '/anomaly', label: 'Anomaly', icon: Activity, key: 'anomaly' },
-  { to: '/training', label: 'Training', icon: GraduationCap },
-  { to: '/summary', label: 'Shift summary', icon: FileText },
-]
+const NAV_BY_ROLE = {
+  operator: [
+    { to: '/start', label: 'Shift start', icon: ClipboardCheck },
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/safety', label: 'Safety', icon: ShieldAlert, key: 'safety' },
+    { to: '/timeline', label: 'Event timeline', icon: History, key: 'timeline' },
+    { to: '/anomaly', label: 'Anomaly', icon: Activity, key: 'anomaly' },
+    { to: '/training', label: 'Training', icon: GraduationCap },
+    { to: '/summary', label: 'Shift summary', icon: FileText },
+  ],
+  manager: [
+    { to: '/manager', label: 'Task planner', icon: CalendarRange },
+    { to: '/timeline', label: 'Event timeline', icon: History, key: 'timeline' },
+    { to: '/summary', label: 'Shift summary', icon: FileText },
+  ],
+}
+const useNav = () => NAV_BY_ROLE[useApp().role] || []
 
 const TITLES = {
   '/start': 'Shift start', '/dashboard': 'Dashboard', '/safety': 'Safety', '/timeline': 'Event timeline',
   '/anomaly': 'Anomaly', '/training': 'Training hub', '/summary': 'Shift summary & handoff',
+  '/manager': 'Manager dashboard · task planner',
 }
 
 function Logo() {
@@ -53,6 +62,7 @@ function useBadges() {
 function Sidebar() {
   const { meta } = useApp()
   const badges = useBadges()
+  const NAV = useNav()
   return (
     <aside className="no-print sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-line bg-[#0C0F13] lg:flex">
       <div className="px-5 py-5"><Logo /></div>
@@ -90,6 +100,7 @@ function Sidebar() {
 
 function MobileNav() {
   const badges = useBadges()
+  const NAV = useNav()
   return (
     <nav className="no-print fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-line bg-[#0C0F13]/95 backdrop-blur lg:hidden">
       {NAV.map((n) => (
@@ -101,6 +112,24 @@ function MobileNav() {
         </NavLink>
       ))}
     </nav>
+  )
+}
+
+function UserChip() {
+  const { session, logout } = useApp()
+  const nav = useNavigate()
+  if (!session) return null
+  return (
+    <div className="flex items-center gap-2">
+      <div className="hidden text-right xl:block">
+        <div className="text-2xs font-semibold uppercase tracking-wider text-cat">{session.role} · demo</div>
+        <div className="text-xs text-ink2">{session.name} <span className="num text-ink3">{session.id}</span></div>
+      </div>
+      <button className="btn btn-quiet h-10 w-10" title="Sign out (demo session)" aria-label="Sign out"
+        onClick={() => { logout(); nav('/login') }}>
+        <LogOut size={17} />
+      </button>
+    </div>
   )
 }
 
@@ -138,6 +167,7 @@ function TopBar() {
         <button className="btn btn-ghost btn-md" onClick={() => setSimOpen(true)}>
           <FlaskConical size={16} /> <span className="hidden sm:inline">Simulate</span>
         </button>
+        <UserChip />
       </div>
       <AlertBar />
     </header>
@@ -145,14 +175,15 @@ function TopBar() {
 }
 
 function AlertBar() {
-  const { state, active } = useApp()
+  const { state, active, role } = useApp()
   const { pathname } = useLocation()
   const s = state?.safety
   if (!active || !s || s.level === 'SAFE' || pathname === '/safety') return null
+  const to = role === 'operator' ? '/safety' : '/timeline'
   const crit = s.level === 'CRITICAL'
   const Icon = crit ? OctagonAlert : TriangleAlert
   return (
-    <Link to="/safety" key={s.level}
+    <Link to={to} key={s.level}
       className={`flex items-center gap-3 px-4 md:px-6 py-2.5 text-sm font-semibold animate-rise ${crit ? 'bg-crit text-white' : 'bg-warn text-[#1f1000]'}`}>
       <Icon size={18} className={crit ? 'animate-pulse' : ''} />
       <span className="uppercase tracking-wider">{s.level}</span>

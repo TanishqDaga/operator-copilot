@@ -5,7 +5,7 @@ import { useApp } from '../lib/store'
 
 /** Blocks a screen's content until the pre-start checklist is complete. */
 export default function Gate({ children, allowEnded = false, what = 'this screen' }) {
-  const { state } = useApp()
+  const { state, role } = useApp()
   if (!state) return null
   const sh = state.shift
   if (sh.active || (allowEnded && sh.ended)) return children
@@ -14,6 +14,15 @@ export default function Gate({ children, allowEnded = false, what = 'this screen
       <Card>
         <Empty icon={FileText} title="Shift ended" action={<Link className="btn btn-primary btn-md" to="/summary">Open shift summary</Link>}>
           The shift has been closed. The handoff report is ready.
+        </Empty>
+      </Card>
+    )
+  }
+  if (role === 'manager') {
+    return (
+      <Card className="grid-bg">
+        <Empty icon={Lock} title="No shift running yet">
+          The operator starts the shift after the pre-start checklist. Live {what} appear here once it is running.
         </Empty>
       </Card>
     )

@@ -2,9 +2,25 @@
   "shift_plan": "Day shift — Bench 3 / Utility corridor B",
   "synthetic": true,
   "tasks": [
-    {"id": "T1", "name": "Load haul trucks", "location": "Bench 3, face north", "task_type": "load_truck", "tonnes": 260, "distance_m": 20, "terrain": "firm"},
-    {"id": "T2", "name": "Trench for utility line", "location": "Corridor B, ch. 0+120 to 0+180", "task_type": "trenching", "tonnes": 170, "distance_m": 60, "terrain": "soft"},
-    {"id": "T3", "name": "Stockpile rehandle", "location": "ROM pad, stockpile 2", "task_type": "stockpile", "tonnes": 220, "distance_m": 35, "terrain": "firm"},
-    {"id": "T4", "name": "Clean-up and grade haul road edge", "location": "Haul road HR-2", "task_type": "grading", "tonnes": 80, "distance_m": 120, "terrain": "rocky"}
+    {"id": "T1", "name": "Load haul trucks", "location": "Bench 3, face north", "task_type": "load_truck", "tonnes": 260, "distance_m": 20, "terrain": "firm",
+     "description": "Load the 777 haul fleet from the north face of Bench 3.", "estimated_duration_min": 120, "priority": 60,
+     "weather_sensitivity": {"rain": "medium", "wind": "low", "visibility": "medium"},
+     "assigned_operator": "OP-104", "assigned_machine": "CAT320-042", "earliest_start": "09:00", "latest_finish": "19:00"},
+    {"id": "T2", "name": "Trench for utility line", "location": "Corridor B, ch. 0+120 to 0+180", "task_type": "trenching", "tonnes": 170, "distance_m": 60, "terrain": "soft",
+     "description": "Excavate the utility trench to design depth; spoil to the left side.", "estimated_duration_min": 120, "priority": 50,
+     "weather_sensitivity": {"rain": "medium", "wind": "low", "visibility": "medium"},
+     "assigned_operator": "OP-104", "assigned_machine": "CAT320-042", "earliest_start": "09:00", "latest_finish": "19:00"},
+    {"id": "T3", "name": "Stockpile rehandle", "location": "ROM pad, stockpile 2", "task_type": "stockpile", "tonnes": 220, "distance_m": 35, "terrain": "firm",
+     "description": "Rehandle stockpile 2 to square the toe for the loader.", "estimated_duration_min": 90, "priority": 40,
+     "weather_sensitivity": {"rain": "low", "wind": "low", "visibility": "low"},
+     "assigned_operator": "OP-104", "assigned_machine": "CAT320-042", "earliest_start": "09:00", "latest_finish": "19:00"},
+    {"id": "T4", "name": "Clean-up and grade haul road edge", "location": "Haul road HR-2", "task_type": "grading", "tonnes": 80, "distance_m": 120, "terrain": "rocky",
+     "description": "Finish-grade the HR-2 windrow and edge; needs a dry surface for a clean finish.", "estimated_duration_min": 90, "priority": 50,
+     "weather_sensitivity": {"rain": "high", "wind": "low", "visibility": "medium"},
+     "assigned_operator": "OP-104", "assigned_machine": "CAT320-042", "earliest_start": "09:00", "latest_finish": "19:00"},
+    {"id": "T5", "name": "Bulk excavation to stockpile", "location": "Bench 4, west cut", "task_type": "stockpile", "tonnes": 240, "distance_m": 40, "terrain": "firm",
+     "description": "Bulk-dig overburden from the west cut and cast to the stockpile; tolerant of wet conditions.", "estimated_duration_min": 90, "priority": 40,
+     "weather_sensitivity": {"rain": "low", "wind": "low", "visibility": "low"},
+     "assigned_operator": "OP-104", "assigned_machine": "CAT320-042", "earliest_start": "09:00", "latest_finish": "19:00"}
   ]
 }

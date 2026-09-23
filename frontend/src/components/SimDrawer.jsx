@@ -1,11 +1,32 @@
 import { FlaskConical, X } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useApp } from '../lib/store'
 import { MachineControls, PersonControls } from './SimControls'
-import { SyntheticTag } from './ui'
+import { Segmented, SyntheticTag } from './ui'
+
+/** Demo control for the FORECAST (planning input). Current weather stays under Machine & site. */
+function ForecastScenario() {
+  const { forecast, meta, manager, plannerLoading } = useApp()
+  const [err, setErr] = useState(null)
+  const set = async (v) => {
+    setErr(null)
+    try { await manager.setScenario(v) } catch (e) { setErr(e.message) }
+  }
+  const short = { rain_window: 'Rain', clear: 'Clear', wind_visibility: 'Wind/vis', mixed: 'Mixed' }
+  return (
+    <div>
+      <Segmented value={forecast?.scenario} onChange={set}
+        options={(meta?.planning?.scenarios || []).map((s) => ({ value: s.value, label: short[s.value] || s.label, disabled: plannerLoading }))} />
+      <p className="mt-2 text-2xs text-ink3">
+        Changes the synthetic hourly forecast used for planning only. Regenerate the plan afterwards. The current weather in the cab is a separate input below.
+      </p>
+      {err && <p className="mt-1 text-xs text-crit">{err}</p>}
+    </div>
+  )
+}
 
 export default function SimDrawer() {
-  const { simOpen, setSimOpen, active } = useApp()
+  const { simOpen, setSimOpen, active, role } = useApp()
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && setSimOpen(false)
     window.addEventListener('keydown', onKey)
@@ -28,6 +49,12 @@ export default function SimDrawer() {
         </header>
         <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
           <SyntheticTag />
+          {role === 'manager' && (
+            <section>
+              <div className="label mb-3">Forecast scenario (planning)</div>
+              <ForecastScenario />
+            </section>
+          )}
           {!active ? (
             <p className="text-sm text-ink3">Start the shift to use simulation inputs.</p>
           ) : (

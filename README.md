@@ -29,10 +29,43 @@ Optional:
 - **Webcam detection**: needs `ultralytics` + `opencv-python-headless`. The pretrained `yolov8n.pt`
   downloads to `models/` on first use. Without it, the slider fallback drives the same safety path.
 
+Tests: `pip install -r backend/requirements.txt` then `python -m pytest backend/tests`.
+
 On first start the backend generates `data/telemetry_history.csv` and `data/task_history.csv`. It
 also trains both models and caches them in `models/`. Delete `models/*.joblib` to retrain.
 
 ## Demo walkthrough (Definition of done)
+
+0. **Sign in** at `/login` as **Manager** or **Operator** (demo role selection, no passwords — see *Roles* below).
+
+**Weather-aware planner (manager → operator)**
+
+- **Manager** (`/manager`): the synthetic hourly forecast shows rain 13:00–18:00. Assign operators and machines, and
+  create or edit tasks and their rain / wind / visibility sensitivity. Then press **Generate weather-aware plan**. T4
+  (grading, HIGH rain sensitivity) moves from 14:47 to 09:00. T3 (stockpile, LOW rain sensitivity) is placed in the
+  rain window. Each move has a reason with the forecast numbers, and the plan shows the estimated minutes saved.
+  **Override** (move earlier/later or pin a start time) keeps the manager's decision. **Publish schedule** stores it
+  in `data/planning.json`.
+- **Operator** (`/dashboard`): *Today's schedule* shows the current, next and remaining tasks, each with its window,
+  machine, the forecast for that window and a *Why now?* note. It is visible before the checklist too.
+- During a shift, **Replan future tasks** → **Publish** re-sequences only pending tasks. The active task never
+  moves, and nothing reshuffles on its own. A WARNING/CRITICAL safety event outranks every schedule
+  recommendation.
+
+**Operator task planner (execution guidance, read-only)**
+
+- On `/dashboard` the **Operator task planner** shows one **Next best action** with a *Why?*, plus: the current task
+  (progress, live ETA, early/late, task details on click), the next task with preparation steps, the next 2–3 tasks,
+  weather ahead and live productivity. It follows the published order and never reorders, reassigns or republishes
+  anything.
+- Demo: **Simulate → Operator pace → Brisk**. After three cycles the planner shows *Projected N min early*, then
+  *nearly complete — prepare for Load haul trucks*, then *Next assigned task: Load haul trucks*. **Trigger idle**
+  switches it to IDLE. A walk-in switches it to SAFETY_HOLD, and all task, weather and productivity guidance is
+  deferred until the safety condition clears.
+- The shift summary adds **Operator productivity** and **Productivity opportunities**. These are factual
+  observations, not scores or rankings.
+
+**Live copilot**
 
 1. **Shift start**: pick an operator and tick all 10 pre-start items. Until then, the dashboard and
    the other live screens stay locked.
@@ -64,8 +97,57 @@ backend/main.py ── Engine: 1 Hz background tick
    ├─ vision.py     webcam frame → YOLOv8n person box → K/h distance proxy + approach speed
    ├─ anomaly.py    IsolationForest (per machine state) + operator's own median/IQR baseline
    ├─ eta.py        RandomForestRegressor, 80/20 split, held-out MAE = the ± band
-   └─ ai.py         Claude explanation (3 sentences, facts only) + instant template fallback
+   ├─ ai.py         Claude explanation (3 sentences, facts only) + instant template fallback
+   │  weather-aware planner (deterministic, never the LLM)
+   ├─ weather.py          synthetic, seeded hourly forecast + hazard windows (scenarios: rain/clear/wind/mixed)
+   ├─ planner.py          sensitivity profiles, scoring, list-scheduling heuristic — all coefficients in one block
+   ├─ planner_explain.py  template reasons ("Moved 14:47 → 09:00 because rain reaches 85%…") + summary
+   ├─ planning_store.py   data/planning.json persistence (seeded from tasks.json) + task validation
+   ├─ planning_service.py locks done/active tasks, publishes, re-sequences LiveSim pending tasks, logs events
+   ├─ planning_api.py     REST routes · roles.py demo role checks · priority.py safety > anomaly > schedule
+   │  operator task planner (consumes the published schedule, read-only)
+   ├─ schedule_clock.py   maps published windows onto the live shift (ETA-model expected durations)
+   ├─ operator_planner.py states, next best action + reason, preparation, weather guidance
+   ├─ operator_metrics.py utilisation, idle, cycle vs baseline, shift roll-up + opportunities
+   └─ operator_service.py / operator_api.py  read-only inputs from Engine + GET /api/operator/planner
 ```
+
+### Operator task planner
+
+- **Inputs** (all existing): the published schedule, the ETA model's live prediction and baseline, LiveSim telemetry
+  (time working, repositioning or idle, each cycle), current weather, the synthetic forecast, the safety rule engine
+  and the anomaly detector.
+- **Schedule clock**: published windows are day-scale (09:00–19:00), but the demo machine moves the synthetic tonnage
+  in minutes. Each of the operator's published windows is therefore laid onto the live shift, in published order,
+  with its ETA-model expected duration × the manager planner's weather factor. That mapping is the reference for
+  early/late, time to the next task and "rain in N min". The UI shows it as `schedule 09:52 · live 02:31 · ×4`.
+- **States**: ACTIVE, APPROACHING_COMPLETION, EARLY_FINISH, WAITING, IDLE, TRAVELING, WEATHER_PREPARATION,
+  SAFETY_HOLD, READY_FOR_NEXT_TASK. Early/late is judged only after 3 cycles on the current task, once the ETA has
+  settled. Metrics show *Collecting data* until they are meaningful (5 cycles, 2 min of shift).
+- **Priority** (`priority.rank_guidance`): critical safety › safety warning › machine/operational issue › current
+  task › weather › productivity. While a safety rule is active, productivity items are dropped and everything else is
+  deferred.
+
+### Weather-aware scheduling
+
+- **Duration**: the manager's planning estimate if set, otherwise the existing ETA model (clear weather, assigned
+  operator's experience and historical cycle time).
+- **Penalty per forecast hour**: `W[rain] × 0.6 × P(rain) + W[wind] × 0.5 × wind severity + W[vis] × 0.4 × visibility severity`,
+  with `W = {low 0.1, medium 0.5, high 1.0}`. Effective duration is integrated hour by hour. Rain enters as a
+  probability, so 40% costs half as much as 80%.
+- **Sequencing**: the default is always the manager's next task. Another task is pulled forward only if doing it now,
+  rather than last, avoids at least 5 more minutes of weather delay than the default would. Dependencies,
+  earliest-start and latest-finish constraints and operator/machine overlaps are respected. Done and active tasks are
+  locked, and manager overrides are pinned.
+- **Time saved** = Σ weather-adjusted duration (original order) − Σ (recommended). It is an estimate from synthetic
+  data, not a measured gain.
+
+### Roles (demo only)
+
+`/login` stores `{role, id}` in localStorage, and every request sends `X-Demo-Role` / `X-Demo-User`. `roles.py` turns
+these into a `User` and `require_manager` guards planner writes (403 for operators). **Anyone can set these headers
+— this is not authentication.** Routes depend only on `current_user` / `require_manager`, so a real provider can
+replace `roles.py` and `frontend/src/lib/session.js` later.
 
 ### Where every number comes from
 
@@ -90,12 +172,23 @@ backend/main.py ── Engine: 1 Hz background tick
 | GET | `/api/events` | Event log, newest first (also persisted to `data/events.json`) |
 | GET | `/api/training` | Modules, recommendations from today's events, bookings, open slots |
 | POST | `/api/training/book` | `{module_id, slot}` → appends to `data/training.json` |
-| POST | `/api/sim` | `{action, value}`: `move_worker`, `walk_worker`, `trigger_idle`, `seatbelt_off`, `weather`, `tram`, `person_source` |
+| POST | `/api/sim` | `{action, value}`: `move_worker`, `walk_worker`, `trigger_idle`, `seatbelt_off`, `weather`, `tram`, `person_source`, `pace` (`slow`/`normal`/`brisk`) |
 | POST | `/api/explain` | `{event_id?}` → `{text, source: llm|template, context}` |
-| GET | `/api/summary` | Shift roll-up for the handoff report |
+| GET | `/api/summary` | Shift roll-up for the handoff report (now includes `operator_productivity`) |
 | POST | `/api/shift/start` · `/api/shift/end` · `/api/shift/note` | Shift lifecycle |
 | POST | `/api/vision/frame` | `{image: dataURL}` → person boxes, distance proxy, approach |
-| GET | `/api/meta` | Constants, model metrics, operators, checklist |
+| GET | `/api/meta` | Constants, model metrics, operators, checklist, machines, planner presets |
+| GET | `/api/weather/forecast` | Synthetic hourly forecast + hazard windows (any role) |
+| POST | `/api/weather/scenario` | `{scenario}`: `rain_window`, `clear`, `wind_visibility`, `mixed` (manager) |
+| GET | `/api/planner` | Tasks, forecast, original schedule, stored recommendation, published schedule (manager) |
+| POST · PUT · DELETE | `/api/planner/tasks` · `/api/planner/tasks/{id}` | Create / edit / delete a task (manager) |
+| POST | `/api/planner/assign` | `{task_id, operator_id, machine_id}` (manager) |
+| POST | `/api/planner/recommend` · `/api/planner/replan` | Generate / recalculate the weather-aware plan (manager) |
+| POST | `/api/planner/override` | `{task_id, move: up\|down}` or `{task_id, start: "HH:MM"}` or `{task_id, clear: true}` (manager) |
+| POST | `/api/planner/accept` · `/api/planner/publish` · `/api/planner/reset` | Accept (clears overrides), publish, reset demo plan (manager) |
+| GET | `/api/operator/schedule` | The signed-in operator's published tasks with status and "why now" |
+| POST | `/api/operator/schedule/ack` | Operator acknowledges the published schedule |
+| GET | `/api/operator/planner` | Operator task planner: next best action, current/next/upcoming tasks, weather, productivity (read-only) |
 
 ## Design notes
 
