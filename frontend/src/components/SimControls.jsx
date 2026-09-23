@@ -1,4 +1,4 @@
-import { Camera, Cloud, CloudRain, Footprints, Hourglass, Play, SlidersHorizontal, Sun, Truck, UserX } from 'lucide-react'
+import { Camera, Cloud, CloudRain, Footprints, Hourglass, ListOrdered, Play, SlidersHorizontal, Sun, Truck, UserX } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useCamera } from '../lib/camera'
 import { fmt } from '../lib/format'
@@ -128,6 +128,14 @@ export function MachineControls({ only }) {
   const show = (k) => !only || only.includes(k)
   return (
     <div className="space-y-4">
+      {show('stack') && (
+        <div>
+          <button className="btn btn-primary btn-md w-full" onClick={() => run('stack_alerts')} title="Worker approaching + seatbelt + idle + task delay + training nudge">
+            <ListOrdered size={16} /> Flagship: five signals at once
+          </button>
+          <p className="mt-2 text-2xs text-ink3">Fires five live signals. The cab shows only the worker-in-path headline; the other four are logged, not urgent.</p>
+        </div>
+      )}
       {show('idle') && (
         <div>
           <div className="mb-2 flex items-center justify-between">

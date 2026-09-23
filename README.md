@@ -36,19 +36,24 @@ also trains both models and caches them in `models/`. Delete `models/*.joblib` t
 
 1. **Shift start**: pick an operator and tick all 10 pre-start items. Until then, the dashboard and
    the other live screens stay locked.
-2. **Dashboard**: the active task shows its ETA with **± the real held-out MAE** (3.4 min on 540 test
-   tasks). The shift plan lists every task's ETA and error.
-3. **Safety**: press *Walk-in* (or drag the slider). The level goes SAFE → WARNING → CRITICAL within a
+2. **Flagship — five signals at once**: Simulate → **Flagship: five signals at once**. Seatbelt, idle
+   anomaly, task delay, worker approaching and a training nudge all fire. The dashboard shows only
+   **Worker entering active path — reduce speed. (4 other items logged, not urgent.)** Score =
+   severity × time-to-harm × confidence × context (`backend/priority.py`). The LLM does not rank.
+   Open the timeline for the four quiet items.
+3. **Dashboard**: below the queue, the active task shows its ETA with **± the real held-out MAE**
+   (3.4 min on 540 test tasks). The shift plan lists every task's ETA and error.
+4. **Safety**: press *Walk-in* (or drag the slider). The level goes SAFE → WARNING → CRITICAL within a
    second, with the reasons listed beside the colour.
-4. The event is **auto-logged**. On CRITICAL an explanation appears automatically (LLM or template).
-5. **Simulate → Trigger idle (15 min)**: the anomaly card shows *15 min now vs your usual 4 min* (this
+5. The event is **auto-logged**. On CRITICAL an explanation appears automatically (LLM or template).
+6. **Simulate → Trigger idle (15 min)**: the anomaly card shows *15 min now vs your usual 4 min* (this
    operator's median/IQR) and lists possible causes, stated as unconfirmed.
-6. The ETA card shows *ETA changed by +15 min because machine idle…*.
-7. **Seatbelt unfastened + Tram** → WARNING `seatbelt`. **Rain + Tram** → WARNING `wet_ground`. **Heat**
-   → hydration notice.
-8. **Training** recommends modules from today's actual events; *Book instructor* appends to
+7. The ETA card shows *ETA changed by +15 min because machine idle…*.
+8. **Seatbelt unfastened + Tram** → WARNING `seatbelt`. **Rain + Tram** → WARNING `wet_ground`. **Heat**
+   → hydration notice (logged; only a headline if it wins the product score).
+9. **Training** recommends modules from today's actual events; *Book instructor* appends to
    `data/training.json`.
-9. **Shift summary** rolls everything up. Add handoff notes and end the shift.
+10. **Shift summary** rolls everything up. Add handoff notes and end the shift.
 
 The **Simulate** button in the header opens every synthetic input from any screen.
 
@@ -61,6 +66,7 @@ frontend (React + Vite + Tailwind, React Router, one app shell)
 backend/main.py ── Engine: 1 Hz background tick
    ├─ simulator.py  synthetic history + LiveSim (machine cycles, tram, idle, fuel, hyd temp)
    ├─ safety.py     deterministic rules + constants block  ← the trust anchor, never the LLM
+   ├─ priority.py   severity × time-to-harm × confidence × context → one headline (LLM never ranks)
    ├─ vision.py     webcam frame → YOLOv8n person box → K/h distance proxy + approach speed
    ├─ anomaly.py    IsolationForest (per machine state) + operator's own median/IQR baseline
    ├─ eta.py        RandomForestRegressor, 80/20 split, held-out MAE = the ± band
@@ -71,6 +77,7 @@ backend/main.py ── Engine: 1 Hz background tick
 
 | On screen | Source |
 |---|---|
+| Headline action | Highest `severity × time-to-harm × confidence × context` in `priority.py`. Other live signals are logged, not shown in the cab. |
 | Safety level + reasons | `safety.py` rules; constants `D_WARN=8 m, D_CRIT=4 m, T_WARN=4 s, T_CRIT=2 s, V_WET=1.5 km/h` |
 | Time-to-contact | `distance / max(machine speed + person approach, 0.1 m/s)` |
 | Camera distance | `K / box-height` with K = 1.6 chosen by eye. **An uncalibrated proxy, labeled as such in the UI** |
@@ -85,12 +92,13 @@ backend/main.py ── Engine: 1 Hz background tick
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/state` | Live state (data contract + extras such as `task`, `notices`, `baseline_snapshot`) |
+| GET | `/api/state` | Live state (data contract + extras such as `task`, `notices`, `alerts`, `baseline_snapshot`) |
+| GET | `/api/alerts` | `{headline, quiet, quiet_count, items}` — one cab action; `items` is the quiet log payload |
 | GET | `/api/tasks` | Shift plan with ETA ± error, predicted-at-start vs actual |
 | GET | `/api/events` | Event log, newest first (also persisted to `data/events.json`) |
 | GET | `/api/training` | Modules, recommendations from today's events, bookings, open slots |
 | POST | `/api/training/book` | `{module_id, slot}` → appends to `data/training.json` |
-| POST | `/api/sim` | `{action, value}`: `move_worker`, `walk_worker`, `trigger_idle`, `seatbelt_off`, `weather`, `tram`, `person_source` |
+| POST | `/api/sim` | `{action, value}`: `move_worker`, `walk_worker`, `trigger_idle`, `seatbelt_off`, `weather`, `tram`, `person_source`, `stack_alerts` |
 | POST | `/api/explain` | `{event_id?}` → `{text, source: llm|template, context}` |
 | GET | `/api/summary` | Shift roll-up for the handoff report |
 | POST | `/api/shift/start` · `/api/shift/end` · `/api/shift/note` | Shift lifecycle |
@@ -99,8 +107,9 @@ backend/main.py ── Engine: 1 Hz background tick
 
 ## Design notes
 
-- **The LLM never decides severity.** It receives only a facts JSON built from computed values. If
-  its reply contains a number that isn't in the facts, the template is used instead.
+- **The LLM never decides severity or rank.** It receives only a facts JSON built from computed values. If
+  its reply contains a number that isn't in the facts, the template is used instead. Alert order comes
+  only from `priority.py`.
 - **A flag is never carried across machine states.** The anomaly detector resets when the machine
   switches between idle and working, so warming oil after an idle can't be mislabeled as an anomaly.
 - **Safety text is never invisible.** Level changes animate with transforms only, never opacity.

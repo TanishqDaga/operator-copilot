@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import ai
+import priority
 import training_rag
 import safety
 from anomaly import AnomalyDetector
@@ -390,6 +391,35 @@ class Engine:
                     self._log("weather", "INFO", f"Weather changed: {prev} → {value}", weather=value)
             elif action == "tram":
                 sim.request_tram()
+            elif action == "stack_alerts":
+                sim.seatbelt = False
+                sim.start_idle(15)
+                sim.tick(1.0)
+                self.person_source = "slider"
+                self.walk = None
+                self.worker_d = 2.0
+                self._prev_d = 3.5
+                self._approach = 1.4
+                self._log("sim", "INFO",
+                          "Five-signal demo: worker approaching, seatbelt off, idle, task delay, training nudge",
+                          detail="Cab shows one headline; the rest are logged quietly")
+                self._log("seatbelt", "INFO", "Seatbelt unfastened",
+                          detail="Live warning — product score keeps it below an approaching worker")
+                d, approach, _ = self._update_person(1.0)
+                self._update_safety(d, approach)
+                for _ in range(3):
+                    self._update_anomaly()
+                self._update_eta()
+                if self.eta_out is not None and abs(self.eta_out.get("changed_by") or 0) < 5:
+                    mins = round(sim.idle_min)
+                    reason = (f"Machine idle {mins:.0f} min — no material moved, finish moves out by the idle time")
+                    self.eta_ann = {"changed_by": mins, "reason": reason, "at": hhmmss(sim.now())}
+                    self.eta_out = {**self.eta_out, "changed_by": mins, "reason": reason,
+                                    "changed_at": self.eta_ann["at"]}
+                    self._log("eta", "INFO", f"ETA {sim.current_task['id'] if sim.current_task else ''} changed by {mins:+d} min".strip(),
+                              detail=reason, task_id=(sim.current_task or {}).get("id"), changed_by=mins)
+                self._log("training", "INFO", "Training nudge — blind-zone awareness",
+                          detail="Logged quietly; not shown in the cab while a person is in the path")
             else:
                 raise HTTPException(400, f"Unknown action {action}")
             self.state = self._build_state()
@@ -404,7 +434,9 @@ class Engine:
                 "llm": {"available": ai.llm_available(), "model": ai.LLM_MODEL if ai.llm_available() else None},
                 "event_count": len(self.events)}
         if sim is None:
-            return {**base, "ts": hhmmss(datetime.now()), "operator_id": None, "task_id": None}
+            return {**base, "ts": hhmmss(datetime.now()), "operator_id": None, "task_id": None,
+                    "alerts": {"items": [], "empty": True, "policy": "severity_x_tth_x_confidence_x_context",
+                               "headline": None, "quiet_count": 0, "quiet": None}}
         t = sim.current_task
         op = OPERATORS[sim.operator_id]
         started = self.shift.get("started_at")
@@ -424,10 +456,32 @@ class Engine:
                                         "moved_t": round(sim.moved_t[t["id"]], 1),
                                         "progress": round(sim.moved_t[t["id"]] / t["tonnes"], 3)},
             "cycles": sim.cycles_done, "notices": self.notices,
+            "alerts": self._alerts_payload(),
             "baseline_snapshot": {f: {k: round(v, 1) for k, v in b.items() if k != "n"}
                                   for f, b in self.anom.baselines[sim.operator_id]["idle" if sim.idle else "working"].items()},
             "vision": {**base["vision"], "stale": self.person_source == "camera" and self.vision.reading() is None},
         }
+
+    def _alerts_payload(self) -> dict:
+        sim = self.sim
+        if sim is None:
+            return {"items": [], "empty": True, "policy": "severity_x_tth_x_confidence_x_context",
+                    "headline": None, "quiet_count": 0, "quiet": None}
+        return priority.rank({
+            "safety": self.safety_out,
+            "person": self.person,
+            "speed_kmh": sim.speed,
+            "seatbelt": sim.seatbelt,
+            "weather": sim.weather,
+            "anomaly": self.anomaly,
+            "eta": self.eta_out,
+            "has_task": sim.current_task is not None,
+            "person_source": self.person_source,
+        })
+
+    def alerts_view(self) -> dict:
+        with self.lock:
+            return self._alerts_payload()
 
     def tasks_view(self) -> dict:
         with self.lock:
@@ -579,6 +633,7 @@ class Engine:
             "vision": {"available": self.vision.available, "error": self.vision.error, "K": VISION_K},
             "llm": {"available": ai.llm_available(), "model": ai.LLM_MODEL, "timeout_s": ai.LLM_TIMEOUT_S},
             "fuel_tank_l": FUEL_TANK_L,
+            "priority": priority.CONSTANTS,
         }
 
 
@@ -656,6 +711,11 @@ def get_tasks():
 def get_events():
     with engine.lock:
         return list(reversed(engine.events))
+
+
+@app.get("/api/alerts")
+def get_alerts():
+    return engine.alerts_view()
 
 
 @app.get("/api/training")
