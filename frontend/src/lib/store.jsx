@@ -42,6 +42,7 @@ export function AppProvider({ children }) {
   const lastEventId = useRef(null)
   const prevLevel = useRef('SAFE')
   const role = session?.role || null
+  const hasHeadline = useRef(false)
 
   const active = !!state?.shift?.active
   const started = active || !!state?.shift?.ended
@@ -55,6 +56,8 @@ export function AppProvider({ children }) {
     try {
       const s = await api.get('/state')
       setState(s)
+      hasHeadline.current = !!s?.alerts?.headline
+      if (hasHeadline.current) setToasts([])
       setOnline(true)
     } catch {
       setOnline(false)
@@ -66,10 +69,11 @@ export function AppProvider({ children }) {
       const ev = await api.get('/events')
       setEvents(ev)
       const newest = ev[0]?.id ?? 0
-      if (lastEventId.current !== null && newest > lastEventId.current) {
+      if (lastEventId.current !== null && newest > lastEventId.current && !hasHeadline.current) {
         const fresh = ev.filter((e) => e.id > lastEventId.current && TOAST_KINDS.has(e.kind) && e.level !== 'SAFE')
-        if (fresh.length) {
-          setToasts((t) => [...fresh.slice(0, 3).map((e) => ({ ...e, key: `${e.id}-${Date.now()}` })), ...t].slice(0, 4))
+        const prefer = fresh.find((e) => e.level === 'CRITICAL') || fresh[0]
+        if (prefer) {
+          setToasts((t) => [{ ...prefer, key: `${prefer.id}-${Date.now()}` }, ...t].slice(0, 2))
         }
       }
       lastEventId.current = newest

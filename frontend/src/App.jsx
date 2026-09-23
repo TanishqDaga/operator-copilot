@@ -10,7 +10,7 @@ import Safety from './screens/Safety'
 import ShiftStart from './screens/ShiftStart'
 import Summary from './screens/Summary'
 import Timeline from './screens/Timeline'
-import Training from './screens/Training'
+import TrainingHub from './screens/training/TrainingHub'
 
 function Home() {
   const { state, role } = useApp()
@@ -43,7 +43,7 @@ export default function App() {
         <Route path="safety" element={<RequireRole roles={OP}><Safety /></RequireRole>} />
         <Route path="timeline" element={<RequireRole roles={ANY}><Timeline /></RequireRole>} />
         <Route path="anomaly" element={<RequireRole roles={OP}><Anomaly /></RequireRole>} />
-        <Route path="training" element={<RequireRole roles={OP}><Training /></RequireRole>} />
+        <Route path="training/*" element={<RequireRole roles={OP}><TrainingHub /></RequireRole>} />
         <Route path="summary" element={<RequireRole roles={ANY}><Summary /></RequireRole>} />
         <Route path="*" element={<Home />} />
       </Route>

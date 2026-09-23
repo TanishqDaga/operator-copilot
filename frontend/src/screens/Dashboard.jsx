@@ -1,9 +1,9 @@
-import { Cloud, CloudRain, Droplets, Fuel, Gauge, History, Hourglass, Link2, Link2Off, Navigation, Repeat, Sun, Thermometer, Weight, Wrench } from 'lucide-react'
+import { Cloud, CloudRain, Fuel, Gauge, History, Hourglass, Link2, Link2Off, Navigation, Repeat, Sun, Thermometer, Weight, Wrench } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import AlertQueue from '../components/AlertQueue'
 import { AnomalyCompact } from '../components/AnomalyCard'
 import EventList from '../components/EventList'
 import ExplainPanel from '../components/ExplainPanel'
-import SafetyBanner from '../components/SafetyBanner'
 import OperatorTaskPlanner from '../components/OperatorTaskPlanner'
 import { EtaCard, TaskList } from '../components/TaskCards'
 import TodaySchedule from '../components/TodaySchedule'
@@ -31,16 +31,10 @@ export default function Dashboard() {
 }
 
 function DashboardView() {
-  const { state, meta, events } = useApp()
+  const { events } = useApp()
   return (
         <div className="space-y-5">
-          <SafetyBanner state={state} variant="compact" meta={meta} />
-          {state.notices?.[0] && (
-            <div className="flex items-center gap-3 rounded-xl border border-info/30 bg-info-bg px-4 py-3 text-sm text-info animate-rise">
-              <Droplets size={18} /> <span className="font-semibold">{state.notices[0].text}</span>
-              <span className="num ml-auto text-2xs text-ink3">{state.notices[0].ts} · rule: {state.notices[0].rule}</span>
-            </div>
-          )}
+          <AlertQueue />
           <OperatorTaskPlanner />
           <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
             <EtaCard />
