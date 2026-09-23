@@ -1,0 +1,47 @@
+{
+  "modules": [
+    {
+      "id": "blind_zone",
+      "title": "Blind-zone awareness",
+      "trigger": "proximity",
+      "duration_min": 25,
+      "format": "In-cab video + walk-around",
+      "summary": "Know the excavator's blind zones, use cameras and mirrors, and set up exclusion zones with ground crew."
+    },
+    {
+      "id": "efficient_operation",
+      "title": "Efficient machine operation",
+      "trigger": "excess_idle",
+      "duration_min": 30,
+      "format": "Simulator session",
+      "summary": "Reduce unproductive idle, use auto-idle and engine shutdown, and coordinate truck spotting to keep cycles flowing."
+    },
+    {
+      "id": "pre_operation",
+      "title": "Pre-operation safety",
+      "trigger": "seatbelt",
+      "duration_min": 15,
+      "format": "Micro-lesson",
+      "summary": "Seatbelt, mount/dismount, walk-around and pre-start checks before any machine movement."
+    },
+    {
+      "id": "wet_ground",
+      "title": "Working on wet ground",
+      "trigger": "rain",
+      "duration_min": 20,
+      "format": "Micro-lesson + field coaching",
+      "summary": "Travel speed, slope stability, bench edge distance and track slip on wet or soft ground."
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "module_id": "blind_zone",
+      "title": "Blind-zone awareness",
+      "slot": "2026-09-24 07:30",
+      "operator_id": "OP-101",
+      "booked_at": "2026-09-23T22:49:37",
+      "reason": "19 proximity events today (12 critical, closest 1.1 m)"
+    }
+  ]
+}

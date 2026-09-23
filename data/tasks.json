@@ -1,0 +1,10 @@
+{
+  "shift_plan": "Day shift — Bench 3 / Utility corridor B",
+  "synthetic": true,
+  "tasks": [
+    {"id": "T1", "name": "Load haul trucks", "location": "Bench 3, face north", "task_type": "load_truck", "tonnes": 260, "distance_m": 20, "terrain": "firm"},
+    {"id": "T2", "name": "Trench for utility line", "location": "Corridor B, ch. 0+120 to 0+180", "task_type": "trenching", "tonnes": 170, "distance_m": 60, "terrain": "soft"},
+    {"id": "T3", "name": "Stockpile rehandle", "location": "ROM pad, stockpile 2", "task_type": "stockpile", "tonnes": 220, "distance_m": 35, "terrain": "firm"},
+    {"id": "T4", "name": "Clean-up and grade haul road edge", "location": "Haul road HR-2", "task_type": "grading", "tonnes": 80, "distance_m": 120, "terrain": "rocky"}
+  ]
+}

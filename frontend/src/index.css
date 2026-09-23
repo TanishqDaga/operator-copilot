@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { color-scheme: dark; }
+  body { font-feature-settings: 'cv11', 'ss01'; background: #0A0C0F; }
+  .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  ::selection { background: rgba(255, 205, 17, 0.3); }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-thumb { background: #2E3540; border-radius: 8px; border: 2px solid #0A0C0F; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  :focus-visible { outline: 2px solid #FFCD11; outline-offset: 2px; border-radius: 8px; }
+}
+
+@layer components {
+  .card { @apply bg-panel border border-line rounded-2xl shadow-card; }
+  .label { @apply text-2xs font-semibold uppercase tracking-[0.12em] text-ink3; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 select-none disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]; }
+  .btn-md { @apply h-11 px-4 text-sm; }
+  .btn-lg { @apply h-14 px-6 text-base; }
+  .btn-sm { @apply h-9 px-3 text-[13px]; }
+  .btn-primary { @apply bg-cat text-cat-ink hover:bg-[#FFD84A]; }
+  .btn-ghost { @apply bg-raised text-ink border border-line2 hover:border-ink3 hover:bg-[#20262e]; }
+  .btn-quiet { @apply text-ink2 hover:text-ink hover:bg-raised; }
+  .btn-danger { @apply bg-crit text-white hover:bg-[#ff6365]; }
+  .grid-bg {
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .hazard {
+    background-image: repeating-linear-gradient(-45deg, #FFCD11 0 10px, #1A1400 10px 20px);
+  }
+  input[type='range'].slider { @apply w-full appearance-none bg-transparent cursor-pointer; height: 44px; }
+  input[type='range'].slider::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: #2E3540; }
+  input[type='range'].slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; margin-top: -10px; border-radius: 999px; background: #FFCD11; border: 4px solid #0A0C0F; box-shadow: 0 0 0 1px #FFCD11; }
+  input[type='range'].slider::-moz-range-track { height: 8px; border-radius: 999px; background: #2E3540; }
+  input[type='range'].slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 999px; background: #FFCD11; border: 4px solid #0A0C0F; }
+}
+
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .no-print { display: none !important; }
+  .card { background: #fff !important; border-color: #ddd !important; box-shadow: none !important; }
+}

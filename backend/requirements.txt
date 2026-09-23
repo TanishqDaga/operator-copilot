@@ -1,0 +1,12 @@
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2
+numpy
+pandas
+scikit-learn>=1.4
+joblib
+# optional — webcam person detection (slider fallback works without these)
+ultralytics
+opencv-python-headless
+# optional — LLM explanations (template fallback works without it)
+anthropic

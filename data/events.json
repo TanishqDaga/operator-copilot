@@ -1,0 +1,110 @@
+[
+ {
+  "id": 1,
+  "ts": "23:06:06",
+  "kind": "shift",
+  "level": "INFO",
+  "title": "Shift started \u2014 pre-start checklist complete (10/10)",
+  "detail": "P. Nair on CAT320-042"
+ },
+ {
+  "id": 2,
+  "ts": "23:12:05",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Simulated idle stretch started (5 min fast-forwarded)",
+  "detail": "Synthetic input from the simulation panel"
+ },
+ {
+  "id": 3,
+  "ts": "23:17:07",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Simulated idle stretch started (5 min fast-forwarded)",
+  "detail": "Synthetic input from the simulation panel"
+ },
+ {
+  "id": 4,
+  "ts": "23:17:08",
+  "kind": "eta",
+  "level": "INFO",
+  "title": "ETA T1 changed by +10 min",
+  "detail": "Machine idle 10 min \u2014 no material moved, finish moves out by the idle time",
+  "task_id": "T1",
+  "changed_by": 10
+ },
+ {
+  "id": 5,
+  "ts": "23:22:10",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Simulated idle stretch started (5 min fast-forwarded)",
+  "detail": "Synthetic input from the simulation panel"
+ },
+ {
+  "id": 6,
+  "ts": "23:22:14",
+  "kind": "anomaly",
+  "level": "ANOMALY",
+  "title": "Idle duration unusual: 15.1 min vs your usual 2.4 min",
+  "detail": "Possible causes (not confirmed): Material or haul truck not available; Obstruction or blocked work face; Operator delay (radio call, break, paperwork)",
+  "anomaly_type": "excess_idle",
+  "current": 15.1,
+  "baseline": 2.4,
+  "unit": "min",
+  "score": -0.593,
+  "threshold": -0.54,
+  "context": {
+   "risk": "SAFE",
+   "reasons": [],
+   "anomaly": "excess_idle",
+   "idle_min": 15,
+   "baseline_idle_min": 2,
+   "eta_change_min": 15,
+   "eta_change_reason": "Machine idle 15 min \u2014 no material moved, finish moves out by the idle time",
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Check why the machine is idle. Idle has run 15 min against your usual 2 min \u2014 check whether a truck, obstruction or delay is holding you up. Task ETA has moved +15 min.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 7,
+  "ts": "23:27:25",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Simulated idle stretch started (5 min fast-forwarded)",
+  "detail": "Synthetic input from the simulation panel"
+ },
+ {
+  "id": 8,
+  "ts": "23:27:26",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Work resumed after 20 min idle",
+  "detail": null
+ },
+ {
+  "id": 9,
+  "ts": "23:27:30",
+  "kind": "anomaly",
+  "level": "INFO",
+  "title": "Idle duration back within normal range",
+  "detail": "Peak 20.3 min vs usual 2.4 min"
+ },
+ {
+  "id": 10,
+  "ts": "23:27:30",
+  "kind": "eta",
+  "level": "INFO",
+  "title": "ETA T1 changed by +10 min",
+  "detail": "Work resumed after 20 min idle \u2014 finish moved out by the idle time",
+  "task_id": "T1",
+  "changed_by": 10
+ }
+]
