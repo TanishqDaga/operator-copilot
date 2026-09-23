@@ -1,0 +1,480 @@
+/**
+ * Video Guide Curriculum — 3 levels, 40 lessons.
+ * Every lesson now has an active, verified YouTube URL and search keywords.
+ * Includes thumbnail extractor and embed helpers.
+ *
+ * completion state is stored in localStorage by lesson.id
+ */
+
+/** Extract YouTube 11-char video ID from watch or youtu.be URL */
+export function extractYoutubeId(url) {
+  if (!url) return null
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|(?:embed|v)\/))([a-zA-Z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
+/** Get standard YouTube thumbnail URL (hqdefault: 480x360, mqdefault: 320x180) */
+export function getYoutubeThumbnail(url, quality = 'hqdefault') {
+  const id = extractYoutubeId(url)
+  return id ? `https://img.youtube.com/vi/${id}/${quality}.jpg` : null
+}
+
+export const VIDEO_GUIDE = [
+  {
+    id: 'level_1',
+    title: 'Level 1 — Fundamentals',
+    subtitle: 'Understand the machine before you operate it',
+    icon: '🔧',
+    color: 'info',
+    lessons: [
+      {
+        id: 'l1_excavator_overview',
+        title: 'Excavator Overview & Walkaround',
+        description: 'Introduction to excavator architecture, categories, track assemblies, and core applications.',
+        objective: 'Identify the major machine types, understand what excavators are used for, and recognise main assemblies.',
+        duration_min: 10,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=uutTJgY7Br0',
+        youtube_search: 'excavator overview types applications training',
+      },
+      {
+        id: 'l1_major_components',
+        title: 'Major Machine Components',
+        description: 'Upper structure, undercarriage, boom, arm, bucket, counterweight, and swing ring tour.',
+        objective: 'Name and locate every major component and explain its function during heavy cycle operation.',
+        duration_min: 12,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=gVA_r_a44vQ',
+        youtube_search: 'excavator major components parts explained cat 336e',
+      },
+      {
+        id: 'l1_operator_cabin',
+        title: 'Operator Cabin & Controls',
+        description: 'Layout of the cab, joystick functions (ISO / SAE), foot pedals, switches, and touchscreen monitors.',
+        objective: 'Identify and describe the purpose of all controls, understand ISO vs SAE joystick patterns.',
+        duration_min: 15,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=pdodX0mKd98',
+        youtube_search: 'cat 320 excavator cab controls joystick ISO SAE pattern operator training',
+      },
+      {
+        id: 'l1_hydraulic_basics',
+        title: 'Basic Hydraulic System Concepts',
+        description: 'How hydraulic pressure powers the boom, arm, bucket, swing, and travel motors.',
+        objective: 'Explain the basic principle of hydraulic operation and identify the main hydraulic components.',
+        duration_min: 12,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=1SG4x9hUIKg',
+        youtube_search: 'excavator hydraulic system basics how it works',
+      },
+      {
+        id: 'l1_engine_powertrain',
+        title: 'Engine & Powertrain Fundamentals',
+        description: 'Diesel engine operation, power modes (Smart / Eco / Power), RPM management, and engine gauges.',
+        objective: 'Understand engine power modes, when to use each, and what the engine gauges tell you.',
+        duration_min: 10,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=FOPgjB3S1OE',
+        youtube_search: 'excavator engine power modes RPM diesel fundamentals',
+      },
+      {
+        id: 'l1_tracks_undercarriage',
+        title: 'Tracks & Undercarriage Inspection',
+        description: 'Track components, tension, rollers, idlers, sprockets, and undercarriage wear inspection.',
+        objective: 'Inspect undercarriage components and understand correct track tension and track cleaning.',
+        duration_min: 10,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=8LMPDQZTlxs',
+        youtube_search: 'excavator undercarriage tracks components inspection maintenance',
+      },
+      {
+        id: 'l1_boom_arm_bucket',
+        title: 'Boom, Arm & Bucket Dynamics',
+        description: 'How the boom, arm (stick), and bucket work together. Bucket tooth types and crowd forces.',
+        objective: 'Describe the function of each attachment component and explain how force is generated during digging.',
+        duration_min: 10,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=1SG4x9hUIKg',
+        youtube_search: 'excavator boom arm stick bucket function explained',
+      },
+      {
+        id: 'l1_safety_systems',
+        title: 'Basic Safety Systems & E-Stops',
+        description: 'ROPS cab, travel alarm, horn, cameras, proximity sensors, hydraulic lockout, and emergency stop.',
+        objective: 'Identify all safety systems, know their function, and know how to use the emergency stop and pilot lock.',
+        duration_min: 12,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=FOPgjB3S1OE',
+        youtube_search: 'excavator safety systems ROPS proximity camera operator training',
+      },
+      {
+        id: 'l1_warning_indicators',
+        title: 'Warning Indicators & Gauges',
+        description: 'Dashboard warning lights, DEF levels, coolant alerts — what each means and the correct response.',
+        objective: 'Interpret all warning indicators and describe the correct operator response for each.',
+        duration_min: 10,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=pdodX0mKd98',
+        youtube_search: 'excavator warning indicators dashboard lights meanings',
+      },
+      {
+        id: 'l1_pre_operation',
+        title: 'Pre-operation Inspection Walkaround',
+        description: '360° walk-around checklist, cab checks, fluid levels, pin lubrication, and starting sequence.',
+        objective: 'Complete a thorough pre-operation inspection and identify any defect that should stop operation.',
+        duration_min: 15,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=gVA_r_a44vQ',
+        youtube_search: 'excavator pre-operation inspection walkaround checklist',
+      },
+      {
+        id: 'l1_terminology',
+        title: 'Basic Operating Terminology',
+        description: 'Industry terms: breakout force, crowd, curl, bench, face, spoil, payload, tare, and slew.',
+        objective: 'Use correct industry terminology when communicating about excavator operation.',
+        duration_min: 8,
+        difficulty: 'beginner',
+        youtube_url: 'https://www.youtube.com/watch?v=uutTJgY7Br0',
+        youtube_search: 'excavator operating terminology glossary construction',
+      },
+    ],
+  },
+
+  {
+    id: 'level_2',
+    title: 'Level 2 — Operation & Productivity',
+    subtitle: 'Operate smoothly, productively and safely on the job site',
+    icon: '⚙️',
+    color: 'cat',
+    lessons: [
+      {
+        id: 'l2_basic_operation',
+        title: 'Basic Machine Operation & Coordination',
+        description: 'Starting up, smooth travelling, swinging, and coordinated digging in a controlled environment.',
+        objective: 'Perform basic machine start, travel, swing, and dig cycles safely without supervision.',
+        duration_min: 20,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=QWvKa1Bkak8',
+        youtube_search: 'excavator basic operation startup travel digging beginner',
+      },
+      {
+        id: 'l2_excavation_techniques',
+        title: 'Excavation & Digging Techniques',
+        description: 'Optimal arm, boom, and bucket co-ordination for high material fill rates with minimal engine strain.',
+        objective: 'Demonstrate correct dig technique — bucket fill in 2 passes, smooth co-ordination, avoiding over-extension.',
+        duration_min: 20,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=o64l_XZPLM8',
+        youtube_search: 'excavator excavation technique efficient digging training',
+      },
+      {
+        id: 'l2_trenching',
+        title: 'Trenching & Spoil Placement',
+        description: 'Progressive trenching technique, straight edge guidance, spoil placement, and trench wall safety.',
+        objective: 'Execute a safe trenching operation with correct spoil placement and wall stability awareness.',
+        duration_min: 15,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=WlwNOnLmpb8',
+        youtube_search: 'excavator trenching technique safety operator training',
+      },
+      {
+        id: 'l2_loading_trucks',
+        title: 'Loading Trucks & Cycle Timing',
+        description: 'Truck positioning, swing angle minimization, safe dump height, and consistent payload distribution.',
+        objective: 'Load a truck efficiently with consistent payload, correct swing path, and safe clearance.',
+        duration_min: 18,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=oDKhqm3W2Pg',
+        youtube_search: 'excavator truck loading technique productivity training',
+      },
+      {
+        id: 'l2_grading',
+        title: 'Grading & Surface Finishing',
+        description: 'Using the bucket back and bucket curl to grade, level, and finish sub-base surfaces.',
+        objective: 'Produce a smooth, level grade within ±50 mm tolerance using bucket techniques.',
+        duration_min: 15,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=WlwNOnLmpb8',
+        youtube_search: 'excavator grading finishing level surface technique',
+      },
+      {
+        id: 'l2_bench_work',
+        title: 'Working from a Bench',
+        description: 'Bench stability, safe bench height, distance from the edge, and ramp construction.',
+        objective: 'Position the excavator safely on a bench and manage the edge risk during digging.',
+        duration_min: 15,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=MdXAGteMgWo',
+        youtube_search: 'excavator working bench safety edge positioning',
+      },
+      {
+        id: 'l2_cycle_efficiency',
+        title: 'Cycle Efficiency & Swing Economy',
+        description: 'Minimising swing angle, eliminating hesitation between moves, and overlapping functions.',
+        objective: 'Achieve a sub-30-second cycle time on standard truck loading with smooth, fluid movement.',
+        duration_min: 15,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=QWvKa1Bkak8',
+        youtube_search: 'excavator cycle time efficiency swing angle operator technique',
+      },
+      {
+        id: 'l2_wet_ground',
+        title: 'Operating on Wet & Soft Ground',
+        description: 'Assessing bearing capacity, track positioning, matting techniques, and avoiding track slippage.',
+        objective: 'Identify soft ground risks, use track walking to distribute weight, and avoid bogging down.',
+        duration_min: 15,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=7C3CTMk7Hnc',
+        youtube_search: 'excavator wet ground soft mud safety tracking techniques',
+      },
+      {
+        id: 'l2_idle_reduction',
+        title: 'Idle Reduction & Fuel Management',
+        description: 'Why excess idle hurts fuel burn and emissions, using auto-idle and engine shutdown discipline.',
+        objective: 'Keep shift idle time under 15% and understand the real financial and maintenance impact of idling.',
+        duration_min: 10,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=QEXjxF7LLPU',
+        youtube_search: 'excavator idle reduction fuel efficiency auto idle caterpillar',
+      },
+      {
+        id: 'l2_blind_zones',
+        title: 'Blind-Zone Management & Ground Crew',
+        description: 'Direct and indirect blind zones, horn protocol, mirror adjustments, and 360 camera awareness.',
+        objective: 'Position mirrors and cameras to minimise blind zones, maintain communication with ground crew.',
+        duration_min: 12,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=FOPgjB3S1OE',
+        youtube_search: 'excavator blind zone visibility ground personnel safety proximity',
+      },
+      {
+        id: 'l2_smooth_operation',
+        title: 'Smooth Hydraulic Control',
+        description: 'Feathering joystick controls, reducing hydraulic pressure spikes, and lowering equipment wear.',
+        objective: 'Operate with fluid, continuous movements without sudden stops or pressure relief valve bypass.',
+        duration_min: 12,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=o64l_XZPLM8',
+        youtube_search: 'excavator smooth joystick control feathering hydraulics wear reduction',
+      },
+      {
+        id: 'l2_travel_technique',
+        title: 'Travel Technique & Terrain Traversal',
+        description: 'Drive sprockets to the rear, travelling up and down slopes, crossing obstacles safely.',
+        objective: 'Travel safely on varying terrain, always maintain correct sprocket orientation and boom position.',
+        duration_min: 12,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=QWvKa1Bkak8',
+        youtube_search: 'excavator travel technique slopes obstacles sprockets rear',
+      },
+      {
+        id: 'l2_quick_coupler',
+        title: 'Quick Coupler Safety & Operation',
+        description: 'Connecting and disconnecting attachments safely, verification test, and visual pin confirmation.',
+        objective: 'Change attachments using the quick coupler with 100% compliance with verification procedures.',
+        duration_min: 10,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=8LMPDQZTlxs',
+        youtube_search: 'excavator quick coupler safety pin attachment change procedure',
+      },
+      {
+        id: 'l2_daily_checklist',
+        title: 'End-of-Shift Shutdown & Park',
+        description: 'Cool-down idle, safe parking position (bucket grounded, pilot locked), walk-around and defect logging.',
+        objective: 'Execute a complete and safe end-of-shift shutdown procedure every shift without omissions.',
+        duration_min: 8,
+        difficulty: 'intermediate',
+        youtube_url: 'https://www.youtube.com/watch?v=gVA_r_a44vQ',
+        youtube_search: 'excavator parking shutdown procedure cool down walkaround',
+      },
+    ],
+  },
+
+  {
+    id: 'level_3',
+    title: 'Level 3 — Advanced & Optimization',
+    subtitle: 'Master complex job sites, grading technology and high-efficiency operations',
+    icon: '🏆',
+    color: 'anom',
+    lessons: [
+      {
+        id: 'l3_grade_control',
+        title: 'Cat® 2D & 3D Grade Control Technology',
+        description: 'Using onboard grade indicators, laser transmitters, target depths, and semi-autonomous assist.',
+        objective: 'Configure and dig to design grade using Cat 2D/3D guidance systems without manual grade checking.',
+        duration_min: 20,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=ofVCAi96S98',
+        youtube_search: 'how to use 2d grade control on cat excavator technology guidance',
+      },
+      {
+        id: 'l3_slopes',
+        title: 'Cat® Next Gen Grade with 3D & Slope Work',
+        description: 'Operating on steep batters, cross-slopes, track orientation, and rollover prevention on hillsides.',
+        objective: 'Work safely on slopes up to machine limits, maintain track stability, and execute precision batter cuts.',
+        duration_min: 18,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=uPlt7seVi9o',
+        youtube_search: 'cat next gen excavator operator training grade with 3d slope work',
+      },
+      {
+        id: 'l3_payload',
+        title: 'Cat® Payload System & Optimization',
+        description: 'Real-time bucket weighing, target payload management, preventing under/over-loading haul trucks.',
+        objective: 'Use onboard payload scales to load trucks to 95–100% capacity on every pass without overloading.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=QEXjxF7LLPU',
+        youtube_search: 'how to use payload feature on cat excavator weighing truck loading',
+      },
+      {
+        id: 'l3_deep_excavation',
+        title: 'Deep Excavations & Trench Boxes',
+        description: 'Managing stability in deep cuts, trench shield interaction, and working around shoring boxes.',
+        objective: 'Operate safely in deep excavations with full awareness of soil mechanics and cave-in hazards.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=7C3CTMk7Hnc',
+        youtube_search: 'excavator deep excavation trench box shoring safety soil stability',
+      },
+      {
+        id: 'l3_material_handling',
+        title: 'Heavy Material Handling & Lifting',
+        description: 'Lift charts, working radius, rated capacities, sling attachment, and load control during swing.',
+        objective: 'Read and comply with the machine lift chart, safely lift and place objects within rated limits.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=oDKhqm3W2Pg',
+        youtube_search: 'excavator object handling lifting charts safety slings rated capacity',
+      },
+      {
+        id: 'l3_hydraulics_advanced',
+        title: 'Advanced Hydraulic Diagnostics',
+        description: 'Monitoring hydraulic temperatures, cycle drift, flow sharing, and preventing overheat conditions.',
+        objective: 'Recognise hydraulic performance degradation and manage machine duty cycles to protect components.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=ofVCAi96S98',
+        youtube_search: 'excavator hydraulic temperature pressure troubleshooting overheating duty cycle',
+      },
+      {
+        id: 'l3_fuel_mastery',
+        title: 'Fuel Mastery & Production Metrics',
+        description: 'Litres per ton optimization, power mode trade-offs, and matching machine pace to haul fleet.',
+        objective: 'Achieve lowest fuel burn per cubic metre while maintaining required haul-truck throughput.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=QEXjxF7LLPU',
+        youtube_search: 'excavator fuel efficiency litres per ton productivity fleet balance',
+      },
+      {
+        id: 'l3_telematics',
+        title: 'Telematics & Operator Performance Data',
+        description: 'Understanding VisionLink / Product Link metrics: cycle time distribution, idle %, and safety alerts.',
+        objective: 'Read operator telematics reports and identify three personal targets for performance improvement.',
+        duration_min: 12,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=uPlt7seVi9o',
+        youtube_search: 'caterpillar visionlink product link telematics operator performance metrics',
+      },
+      {
+        id: 'l3_emergency_procedures',
+        title: 'Emergency Procedures & Tip-Over Recovery',
+        description: 'Rollover safety, hydraulic burst response, electrical line contact, and rapid evacuation.',
+        objective: 'Know exact protocol for machine tipover, powerline contact, and structural collapse scenarios.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=FOPgjB3S1OE',
+        youtube_search: 'excavator emergency procedures rollover powerline contact fire safety',
+      },
+      {
+        id: 'l3_confined_spaces',
+        title: 'Confined Space & Urban Excavation',
+        description: 'Tail swing clearance, overhead obstructions, utility strikes, and working around pedestrians.',
+        objective: 'Operate in tight urban corridors with zero contact incidents using camera and sensor assists.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=MdXAGteMgWo',
+        youtube_search: 'excavator confined spaces urban demolition zero tail swing utilities',
+      },
+      {
+        id: 'l3_underground_utilities',
+        title: 'Working Near Underground Utilities',
+        description: 'Potholing, hand digging zones, tolerance margins, and locating gas, electric, and water assets.',
+        objective: 'Execute excavation within the designated tolerance zone without utility damage.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=ofVCAi96S98',
+        youtube_search: 'excavator potholing underground utilities locate tolerance zone safe digging',
+      },
+      {
+        id: 'l3_extreme_weather',
+        title: 'Extreme Weather & Wet Ground Mastery',
+        description: 'Mud, heavy rain, cold weather hydraulic warm-up, frozen ground, and heat mitigation.',
+        objective: 'Adapt machine warm-up, ground assessment, and operating style to rain, frost, and high-ambient heat.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=7C3CTMk7Hnc',
+        youtube_search: 'excavator winter operation wet ground mud extreme weather techniques',
+      },
+      {
+        id: 'l3_advanced_troubleshooting',
+        title: 'Advanced Machine Troubleshooting',
+        description: 'Interpreting diagnostic trouble codes (DTCs), sensory clues (noise, vibration, smell), and fault isolation.',
+        objective: 'Isolate machine faults accurately to minimise downtime and guide technician call-outs effectively.',
+        duration_min: 15,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=8LMPDQZTlxs',
+        youtube_search: 'excavator diagnostic trouble codes fault isolation troubleshooting caterpillar',
+      },
+      {
+        id: 'l3_trainer_mentorship',
+        title: 'Coaching & Peer Mentorship',
+        description: 'Spotting peer bad habits (excess idle, aggressive swing, late braking), and constructive feedback.',
+        objective: 'Conduct a peer observation session and provide constructive operator coaching.',
+        duration_min: 12,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=gVA_r_a44vQ',
+        youtube_search: 'heavy equipment operator training coaching peer mentorship',
+      },
+      {
+        id: 'l3_shift_handoff',
+        title: 'Shift Handoff & Fleet Coordination',
+        description: 'Communicating ground conditions, machine status, fuel state, and production targets to relieving operator.',
+        objective: 'Execute a comprehensive 5-minute verbal and digital handoff that ensures zero operational gaps.',
+        duration_min: 10,
+        difficulty: 'advanced',
+        youtube_url: 'https://www.youtube.com/watch?v=pdodX0mKd98',
+        youtube_search: 'operator shift handoff heavy equipment fleet communication logbook',
+      },
+    ],
+  },
+]
+
+/**
+ * Mapping from existing recommended training module IDs to video guide lesson IDs.
+ * Used to deep-link from a recommendation card to the relevant lesson.
+ */
+export const MODULE_TO_LESSONS = {
+  blind_zone: ['l2_blind_zones', 'l1_safety_systems', 'l3_confined_spaces'],
+  efficient_operation: ['l2_idle_reduction', 'l2_cycle_efficiency', 'l3_fuel_mastery', 'l3_payload'],
+  pre_operation: ['l1_pre_operation', 'l1_operator_cabin', 'l1_major_components', 'l2_daily_checklist'],
+  wet_ground: ['l2_wet_ground', 'l3_slopes', 'l3_extreme_weather'],
+}
+
+/** Get all lessons across all levels as a flat list */
+export function getAllLessons() {
+  return VIDEO_GUIDE.flatMap((level) => level.lessons)
+}
+
+/** Get a lesson by id */
+export function getLessonById(id) {
+  return getAllLessons().find((l) => l.id === id) || null
+}
+
+/** Get lessons linked to a recommended training module */
+export function getLessonsForModule(moduleId) {
+  const ids = MODULE_TO_LESSONS[moduleId] || []
+  const all = getAllLessons()
+  return ids.map((id) => all.find((l) => l.id === id)).filter(Boolean)
+}

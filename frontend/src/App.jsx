@@ -7,7 +7,7 @@ import Safety from './screens/Safety'
 import ShiftStart from './screens/ShiftStart'
 import Summary from './screens/Summary'
 import Timeline from './screens/Timeline'
-import Training from './screens/Training'
+import TrainingHub from './screens/training/TrainingHub'
 
 function Home() {
   const { state } = useApp()
@@ -25,7 +25,7 @@ export default function App() {
         <Route path="safety" element={<Safety />} />
         <Route path="timeline" element={<Timeline />} />
         <Route path="anomaly" element={<Anomaly />} />
-        <Route path="training" element={<Training />} />
+        <Route path="training/*" element={<TrainingHub />} />
         <Route path="summary" element={<Summary />} />
         <Route path="*" element={<Home />} />
       </Route>
