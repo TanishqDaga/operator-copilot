@@ -4,7 +4,7 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { LEVEL, REASON_LABEL } from '../lib/format'
+import { LEVEL } from '../lib/format'
 import { useApp } from '../lib/store'
 import ErrorBoundary from './ErrorBoundary'
 import SimDrawer from './SimDrawer'
@@ -147,18 +147,26 @@ function TopBar() {
 function AlertBar() {
   const { state, active } = useApp()
   const { pathname } = useLocation()
-  const s = state?.safety
-  if (!active || !s || s.level === 'SAFE' || pathname === '/safety') return null
-  const crit = s.level === 'CRITICAL'
+  const h = state?.alerts?.headline
+  if (!active || !h || pathname === '/dashboard') return null
+  const crit = h.id === 'prox' || h.facts?.level === 'CRITICAL'
   const Icon = crit ? OctagonAlert : TriangleAlert
+  const cls = crit ? 'bg-crit text-white' : h.source === 'safety' ? 'bg-warn text-[#1f1000]' : 'bg-raised text-ink'
+  const n = state.alerts.quiet_count || 0
   return (
-    <Link to="/safety" key={s.level}
-      className={`flex items-center gap-3 px-4 md:px-6 py-2.5 text-sm font-semibold animate-rise ${crit ? 'bg-crit text-white' : 'bg-warn text-[#1f1000]'}`}>
-      <Icon size={18} className={crit ? 'animate-pulse' : ''} />
-      <span className="uppercase tracking-wider">{s.level}</span>
-      <span className="truncate font-medium opacity-90">{s.reasons.map((r) => REASON_LABEL[r] || r).join(' · ')} — {s.details[0]}</span>
-      <ChevronRight size={16} className="ml-auto shrink-0" />
-    </Link>
+    <div className={`flex items-center gap-3 px-4 md:px-6 py-2.5 text-sm font-semibold animate-rise ${cls}`}>
+      <Icon size={18} className={`shrink-0 ${crit ? 'animate-pulse' : ''}`} />
+      <span className="min-w-0 flex-1 truncate font-medium">{h.title}</span>
+      {n > 0 && (
+        <Link
+          to="/timeline"
+          className="ml-auto inline-flex max-w-[55%] shrink-0 items-center gap-1 truncate text-2xs font-medium opacity-90 hover:opacity-100"
+        >
+          <span className="truncate">{state.alerts.quiet}</span>
+          <ChevronRight size={16} className="shrink-0" />
+        </Link>
+      )}
+    </div>
   )
 }
 
