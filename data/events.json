@@ -558,5 +558,34 @@
   "level": "INFO",
   "title": "Seatbelt unfastened",
   "detail": "Rule alerts when the machine moves with the belt unfastened"
+ },
+ {
+  "id": 38,
+  "ts": "12:44:18",
+  "kind": "planning",
+  "level": "INFO",
+  "title": "T2 assigned",
+  "detail": "OP-101 on CAT320-042 \u00b7 by J. Okafor",
+  "pre_shift": false,
+  "task_id": "T2"
+ },
+ {
+  "id": 39,
+  "ts": "12:54:05",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 3.5 m away \u2014 inside the critical zone (< 4 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 3.5 m away \u2014 inside the critical zone (< 4 m)"
+  ],
+  "distance_m": 3.5,
+  "ttc_s": 35.3,
+  "source": "camera",
+  "speed_kmh": 0.0,
+  "weather": "clear"
  }
 ]
