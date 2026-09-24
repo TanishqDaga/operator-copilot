@@ -1,6 +1,6 @@
 import { BookOpen, CalendarCheck, CalendarPlus, Check, Clock, GraduationCap, Loader2, MonitorPlay, Sparkles, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Card, CardHeader, Chip, Empty, PageHeader, Source } from '../components/ui'
+import { Card, CardHeader, Chip, Empty, PageHeader } from '../components/ui'
 import { api } from '../lib/api'
 import { useApp } from '../lib/store'
 import Gate from './Gate'
@@ -34,9 +34,6 @@ export default function Training() {
                 Proximity warnings, excess idle, seatbelt events and rain each map to a module. Recommendations appear as they happen.
               </Empty>
             )}
-            <Source className="px-5 pb-4">
-              Mapping: proximity WARNING/CRITICAL → Blind-zone awareness · excess-idle anomaly → Efficient machine operation · seatbelt event → Pre-operation safety · rain → Working on wet ground. Counts come from the event log.
-            </Source>
           </Card>
           <div className="grid gap-5 xl:grid-cols-[1.5fr_1fr]">
             <Card>

@@ -1,6 +1,6 @@
 import { Loader2, MessageSquareText, RefreshCw } from 'lucide-react'
 import { useApp } from '../lib/store'
-import { Card, CardHeader, Chip, Source } from './ui'
+import { Card, CardHeader, Chip } from './ui'
 
 const FACT_LABEL = {
   risk: 'Risk level', reasons: 'Reasons', distance_m: 'Distance (m)', ttc_s: 'Time to contact (s)', speed_kmh: 'Speed (km/h)',
@@ -10,7 +10,7 @@ const FACT_LABEL = {
 }
 
 export default function ExplainPanel({ compact = false }) {
-  const { explanation, explaining, explain, active, meta } = useApp()
+  const { explanation, explaining, explain, active } = useApp()
   const facts = explanation?.context ? Object.entries(explanation.context).filter(([k]) => k !== 'limits') : []
 
   return (
@@ -56,11 +56,6 @@ export default function ExplainPanel({ compact = false }) {
             {active ? 'Generated automatically when the rule engine goes CRITICAL, or on demand.' : 'Available once the shift has started.'}
           </p>
         )}
-        <Source className="mt-4">
-          {meta?.llm?.available
-            ? `LLM (${meta.llm.model}, ${meta.llm.timeout_s}s timeout) with instant template fallback on any failure or if it cites a number not in the facts.`
-            : 'No LLM key configured — explanations come from the deterministic template, built only from the facts above.'}
-        </Source>
       </div>
     </Card>
   )

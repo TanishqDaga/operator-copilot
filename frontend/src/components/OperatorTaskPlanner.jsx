@@ -6,7 +6,7 @@ import ProductivityMetrics from './ProductivityMetrics'
 import TaskPreparationCard from './TaskPreparationCard'
 import UpcomingTasks from './UpcomingTasks'
 import WeatherGuidance from './WeatherGuidance'
-import { Card, CardHeader, Chip, Empty, Source } from './ui'
+import { Card, CardHeader, Chip, Empty } from './ui'
 
 /**
  * Operator Task Planner — how to execute the manager's published schedule well.
@@ -53,10 +53,6 @@ export default function OperatorTaskPlanner() {
           <ProductivityMetrics p={p.productivity} />
         </div>
       </div>
-      <Source className="px-5 py-4">
-        Follows the manager's published order — the operator planner cannot reorder, reassign or republish tasks. Priority: safety › machine issue ›
-        current task › weather › productivity. {clock?.note}
-      </Source>
     </Card>
   )
 }

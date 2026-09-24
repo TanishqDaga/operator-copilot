@@ -1,10 +1,10 @@
 import { CheckCircle2, CircleDashed, Clock, ListChecks, MapPin, Timer, TrendingDown, TrendingUp } from 'lucide-react'
 import { fmt, signed } from '../lib/format'
 import { useApp } from '../lib/store'
-import { Card, CardHeader, Live, Progress, Source } from './ui'
+import { Card, CardHeader, Live, Progress } from './ui'
 
 export function EtaCard() {
-  const { state, meta } = useApp()
+  const { state } = useApp()
   const t = state?.task
   const e = state?.eta
   if (!t || !e) {
@@ -63,12 +63,6 @@ export function EtaCard() {
           )}
         </div>
       </div>
-      <div className="border-t border-line px-5 py-3">
-        <Source>
-          RandomForest on {meta?.eta?.n_train?.toLocaleString()} synthetic past tasks (task type, tonnes remaining, distance, experience, terrain, weather, recent cycle time).
-          ± is the real mean absolute error on {meta?.eta?.n_test} held-out tasks. Re-predicted every second.
-        </Source>
-      </div>
     </Card>
   )
 }
@@ -108,9 +102,6 @@ export function TaskList() {
           </li>
         ))}
       </ul>
-      <div className="border-t border-line px-5 py-3">
-        <Source>Pending tasks use your historical median cycle time for that task type and terrain (synthetic history) and current weather; finishes chain from the active task.</Source>
-      </div>
     </Card>
   )
 }

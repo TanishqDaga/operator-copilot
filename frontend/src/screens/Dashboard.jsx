@@ -7,7 +7,7 @@ import ExplainPanel from '../components/ExplainPanel'
 import OperatorTaskPlanner from '../components/OperatorTaskPlanner'
 import { EtaCard, TaskList } from '../components/TaskCards'
 import TodaySchedule from '../components/TodaySchedule'
-import { Card, CardHeader, Chip, Source, Stat } from '../components/ui'
+import { Card, CardHeader, Chip, Stat } from '../components/ui'
 import { PHASE_LABEL, fmt } from '../lib/format'
 import { useApp } from '../lib/store'
 import Gate from './Gate'
@@ -58,7 +58,7 @@ function DashboardView() {
 }
 
 function MachineCard() {
-  const { state, meta } = useApp()
+  const { state } = useApp()
   const W = WEATHER_ICON[state.weather] || Cloud
   const hot = state.hyd_temp > 75
   return (
@@ -76,7 +76,6 @@ function MachineCard() {
         <Stat icon={state.seatbelt ? Link2 : Link2Off} label="Seatbelt" flash value={state.seatbelt ? 'On' : 'Off'} tone={state.seatbelt ? 'safe' : 'crit'} />
         <Stat icon={W} label="Weather" flash value={state.weather[0].toUpperCase() + state.weather.slice(1)} tone={state.weather === 'rain' ? 'warn' : undefined} />
       </div>
-      <Source className="px-5 py-4">Simulated telemetry (synthetic) ticking once per second; fuel % derived from burn rate and a {meta?.fuel_tank_l} L tank.</Source>
     </Card>
   )
 }

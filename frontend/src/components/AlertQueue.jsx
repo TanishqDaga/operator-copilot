@@ -2,7 +2,6 @@ import { CheckCircle2, OctagonAlert, ShieldAlert } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LEVEL } from '../lib/format'
 import { useApp } from '../lib/store'
-import { Source } from './ui'
 
 const SOURCE_LEVEL = {
   safety: 'CRITICAL',
@@ -16,7 +15,6 @@ export default function AlertQueue() {
   const headline = alerts?.headline
   const quiet = alerts?.quiet
   const n = alerts?.quiet_count || 0
-  const f = headline?.facts
 
   if (!headline) {
     return (
@@ -29,10 +27,8 @@ export default function AlertQueue() {
           <div className="min-w-0">
             <div className="label">Priority engine</div>
             <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-safe">All clear — continue the current task</h2>
-            <p className="mt-2 text-sm text-ink2">No live signal. When several fire at once, only one headline is shown here; the rest are logged quietly.</p>
           </div>
         </div>
-        <Source className="px-6 pb-4">Score = severity × time-to-harm × confidence × context. The LLM never ranks.</Source>
       </section>
     )
   }
@@ -59,16 +55,8 @@ export default function AlertQueue() {
               <Link to="/timeline" className="font-semibold text-ink hover:text-cat">{quiet}</Link>
             </p>
           )}
-          {f && (
-            <p className="mt-2 num text-2xs text-ink3">
-              S {f.severity} × T {f.time_to_harm} × C {f.confidence} × R {f.context} = {f.product}
-            </p>
-          )}
         </div>
       </div>
-      <Source className="px-6 pb-4">
-        One headline. Other live signals are on the event timeline, not in the cab. Formula: severity × time-to-harm × confidence × context.
-      </Source>
     </section>
   )
 }

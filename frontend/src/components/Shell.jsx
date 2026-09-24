@@ -8,7 +8,7 @@ import { LEVEL } from '../lib/format'
 import { useApp } from '../lib/store'
 import ErrorBoundary from './ErrorBoundary'
 import SimDrawer from './SimDrawer'
-import { LevelPill, SyntheticTag } from './ui'
+import { LevelPill } from './ui'
 
 const NAV_BY_ROLE = {
   operator: [
@@ -61,7 +61,6 @@ function useBadges() {
 }
 
 function Sidebar() {
-  const { meta } = useApp()
   const badges = useBadges()
   const NAV = useNav()
   return (
@@ -84,17 +83,6 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="m-3 space-y-2 rounded-xl border border-line bg-panel p-3">
-        <SyntheticTag />
-        <p className="text-2xs leading-4 text-ink3">
-          No live machine data connected. Telemetry, history and models are generated from a synthetic dataset.
-        </p>
-        {meta?.eta && (
-          <p className="text-2xs leading-4 text-ink3 num">
-            ETA model MAE {meta.eta.mae_min} min · n={meta.eta.n_test} held-out
-          </p>
-        )}
-      </div>
     </aside>
   )
 }

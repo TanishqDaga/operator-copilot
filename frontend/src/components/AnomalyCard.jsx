@@ -2,7 +2,7 @@ import { Activity, CircleHelp, Fuel } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ANOMALY_LABEL, fmt } from '../lib/format'
 import { useApp } from '../lib/store'
-import { Card, CardHeader, Chip, Source } from './ui'
+import { Card, CardHeader, Chip } from './ui'
 
 export function BaselineScale({ current, median, q25, q75, unit }) {
   const lo = Math.min(0, current, q25)
@@ -57,7 +57,7 @@ export function AnomalyCompact() {
 }
 
 export function AnomalyDetail() {
-  const { state, meta } = useApp()
+  const { state } = useApp()
   const a = state?.anomaly
   if (!a?.flag) return null
   return (
@@ -73,11 +73,6 @@ export function AnomalyDetail() {
             <Big label="Your usual range" value={`${fmt(a.baseline_q25)}–${fmt(a.baseline_q75)}`} unit={a.unit} tone="text-ink" />
           </div>
           <div className="mt-6"><BaselineScale current={a.current} median={a.baseline} q25={a.baseline_q25} q75={a.baseline_q75} unit={a.unit} /></div>
-          <Source className="mt-2">
-            Baseline = this operator's own median and interquartile range from {a.baseline_n} historical {a.model_state} samples (synthetic).
-            {' '}{fmt(a.robust_z)}× your usual spread from the median. IsolationForest score {fmt(a.score, 3)} is below the flag threshold {fmt(a.threshold, 3)}
-            {' '}(least-typical {Math.round((meta?.anomaly?.score_quantile ?? 0.05) * 100)}% of historical normal data) for {meta?.anomaly?.persist_ticks ?? 3}+ consecutive seconds.
-          </Source>
         </div>
         <div className="space-y-4">
           <div className="rounded-xl border border-line bg-panel2 p-4">
@@ -95,9 +90,6 @@ export function AnomalyDetail() {
             <div className="rounded-xl border border-line bg-panel2 p-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-ink"><Fuel size={16} className="text-cat" /> Fuel burned while idle</div>
               <div className="mt-2 num text-2xl font-semibold text-ink">{fmt(a.idle_fuel_l)} L</div>
-              <Source className="mt-1">
-                {fmt(a.current)} min × {a.idle_burn_lph} L/h ÷ 60. Rate = mean idle burn across {a.idle_burn_n.toLocaleString()} historical idle samples (synthetic).
-              </Source>
             </div>
           )}
         </div>

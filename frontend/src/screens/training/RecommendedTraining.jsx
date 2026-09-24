@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardHeader, Chip, Empty, Source } from '../../components/ui'
+import { Card, CardHeader, Chip, Empty } from '../../components/ui'
 import { getLessonsForModule } from '../../data/videoGuide'
 import { api } from '../../lib/api'
 import { useApp } from '../../lib/store'
@@ -68,11 +68,6 @@ export default function RecommendedTraining() {
                 module. Recommendations appear as they happen.
               </Empty>
             )}
-            <Source className="px-5 pb-4">
-              Mapping: proximity WARNING/CRITICAL → Blind-zone awareness · excess-idle
-              anomaly → Efficient machine operation · seatbelt event → Pre-operation safety
-              · rain → Working on wet ground. Counts come from the event log.
-            </Source>
           </Card>
 
           {/* ── Other Modules + Bookings ──────────────────────────────────── */}

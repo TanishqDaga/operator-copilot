@@ -2,7 +2,7 @@ import { Activity, CheckCircle2, ClipboardCheck, FileText, GraduationCap, Notebo
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { OperatorProductivitySummary } from '../components/ProductivityMetrics'
-import { Card, CardHeader, Chip, KV, LevelPill, PageHeader, Source, SyntheticTag } from '../components/ui'
+import { Card, CardHeader, Chip, KV, LevelPill, PageHeader, SyntheticTag } from '../components/ui'
 import { api } from '../lib/api'
 import { ANOMALY_LABEL, REASON_LABEL, fmt } from '../lib/format'
 import { useApp } from '../lib/store'
@@ -66,9 +66,6 @@ export default function Summary() {
             <Kpi label="Idle total" value={fmt(s.idle.total_min)} unit="min" sub={`≈ ${fmt(s.idle.fuel_l)} L idle fuel`} />
             <Kpi label="Fuel used" value={fmt(s.fuel.used_l)} unit="L" sub={`${s.fuel.start_pct}% → ${s.fuel.now_pct}%`} />
           </div>
-          <Source>
-            Idle fuel = idle minutes × {s.idle.burn_lph} L/h (mean of {s.idle.burn_n.toLocaleString()} historical idle samples) ÷ 60. Fuel used from tank-level change × {s.fuel.tank_l} L tank. All values from synthetic data.
-          </Source>
 
           <OperatorProductivitySummary s={s.operator_productivity} />
 

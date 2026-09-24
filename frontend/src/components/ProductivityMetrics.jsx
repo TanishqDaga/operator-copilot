@@ -1,6 +1,6 @@
 import { Gauge, Lightbulb } from 'lucide-react'
 import { hm } from '../lib/format'
-import { Card, CardHeader, Source } from './ui'
+import { Card, CardHeader } from './ui'
 
 function Metric({ label, value, sub, tone = 'text-ink' }) {
   return (
@@ -67,10 +67,6 @@ export function OperatorProductivitySummary({ s }) {
           </ul>
         ) : <p className="text-sm text-ink3">No notable observations this shift.</p>}
       </div>
-      <Source className="px-5 py-4">
-        {s.note} Schedule adherence: {s.adherence_basis}. Time from the simulator's own accounting (working / repositioning / idle, including
-        fast-forwarded idle); baseline = this operator's historical median cycle for the same task, terrain and weather (synthetic history).
-      </Source>
     </Card>
   )
 }
