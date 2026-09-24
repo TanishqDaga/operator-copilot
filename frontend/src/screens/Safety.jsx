@@ -52,7 +52,7 @@ function SafetyView() {
               <ul className="space-y-2 px-5 pb-3">
                 {rules.map((r) => (
                   <li key={r.id} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors duration-300 ${r.on ? (r.result === 'CRITICAL' ? 'border-crit/50 bg-crit-bg' : r.result === 'NOTICE' ? 'border-info/40 bg-info-bg' : 'border-warn/50 bg-warn-bg') : 'border-line bg-panel2'}`}>
-                    <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-md ${r.on ? 'bg-white/10 text-ink' : 'text-ink3'}`}>{r.on ? <Check size={14} strokeWidth={3} /> : <span className="h-1.5 w-1.5 rounded-full bg-line2" />}</span>
+                    <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-md ${r.on ? 'bg-raised text-ink' : 'text-ink3'}`}>{r.on ? <Check size={14} strokeWidth={3} /> : <span className="h-1.5 w-1.5 rounded-full bg-line2" />}</span>
                     <span className={`flex-1 text-[13px] ${r.on ? 'text-ink' : 'text-ink2'}`}>{r.label}</span>
                     <span className={`text-2xs font-bold ${r.result === 'CRITICAL' ? 'text-crit' : r.result === 'NOTICE' ? 'text-info' : 'text-warn'}`}>{r.result}</span>
                   </li>

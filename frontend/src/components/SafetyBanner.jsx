@@ -8,11 +8,11 @@ const STYLE = {
     text: 'text-safe', iconBox: 'bg-safe/15 text-safe', headline: 'All safety rules clear',
   },
   WARNING: {
-    icon: TriangleAlert, wrap: 'border-warn/50 bg-gradient-to-r from-warn-bg via-[#1a130b] to-panel', accent: 'bg-warn',
+    icon: TriangleAlert, wrap: 'border-warn/50 bg-gradient-to-r from-warn-bg via-panel to-panel', accent: 'bg-warn',
     text: 'text-warn', iconBox: 'bg-warn/15 text-warn', headline: 'Caution — rule threshold crossed',
   },
   CRITICAL: {
-    icon: OctagonAlert, wrap: 'border-crit/70 bg-gradient-to-r from-crit-bg via-[#1f0b0c] to-panel', accent: 'bg-crit',
+    icon: OctagonAlert, wrap: 'border-crit/70 bg-gradient-to-r from-crit-bg via-panel to-panel', accent: 'bg-crit',
     text: 'text-crit', iconBox: 'bg-crit text-white animate-pulseRing', headline: 'Stop — critical safety rule',
   },
 }
@@ -44,7 +44,7 @@ export default function SafetyBanner({ state, variant = 'hero' }) {
             <ul className="space-y-2">
               {s.details.map((d, i) => (
                 <li key={s.reasons[i] || i} className="flex items-start gap-3 animate-rise">
-                  <span className={`mt-0.5 shrink-0 rounded-md px-1.5 py-0.5 text-2xs font-bold uppercase tracking-wider ${st.text} border border-current/30 bg-black/20`}>
+                  <span className={`mt-0.5 shrink-0 rounded-md px-1.5 py-0.5 text-2xs font-bold uppercase tracking-wider ${st.text} border border-current/30 bg-panel/70`}>
                     {REASON_LABEL[s.reasons[i]] || s.reasons[i]}
                   </span>
                   <span className={`text-ink ${hero ? 'text-base' : 'text-sm'}`}>{d}</span>
@@ -69,7 +69,7 @@ export default function SafetyBanner({ state, variant = 'hero' }) {
 
 function Metric({ label, value, unit, sub, hero }) {
   return (
-    <div className={`rounded-xl border border-line2 bg-black/25 px-4 py-3 ${hero ? 'min-w-[132px]' : 'min-w-[112px]'}`}>
+    <div className={`rounded-xl border border-line2 bg-panel/70 px-4 py-3 ${hero ? 'min-w-[132px]' : 'min-w-[112px]'}`}>
       <div className="label">{label}</div>
       <div className="mt-1 flex items-baseline gap-1">
         <span className={`num font-semibold text-ink ${hero ? 'text-3xl' : 'text-2xl'}`}>{value}</span>

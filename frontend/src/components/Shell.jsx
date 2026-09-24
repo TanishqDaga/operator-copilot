@@ -39,12 +39,12 @@ function Logo() {
   return (
     <div className="flex items-center gap-3">
       <svg viewBox="0 0 32 32" className="h-9 w-9 shrink-0">
-        <path d="M16 2l12 7v14l-12 7-12-7V9z" fill="#FFCD11" />
-        <path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="#0A0C0F" />
+        <path d="M16 2l12 7v14l-12 7-12-7V9z" fill="#1A1814" />
+        <path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="#FFCD11" />
       </svg>
       <div className="leading-tight">
-        <div className="text-[15px] font-extrabold tracking-tight text-ink">Operator Copilot</div>
-        <div className="text-2xs font-semibold uppercase tracking-[0.16em] text-cat">CAT in-cab assistant</div>
+        <div className="text-[15px] font-extrabold tracking-tight text-cat-ink">Operator Copilot</div>
+        <div className="text-2xs font-semibold uppercase tracking-[0.16em] text-cat-ink/70">CAT in-cab assistant</div>
       </div>
     </div>
   )
@@ -64,7 +64,7 @@ function Sidebar() {
   const badges = useBadges()
   const NAV = useNav()
   return (
-    <aside className="no-print sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-line bg-[#0C0F13] lg:flex">
+    <aside className="no-print sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-cat-dim bg-cat lg:flex">
       <div className="px-5 py-5"><Logo /></div>
       <nav className="flex-1 space-y-1 px-3">
         {NAV.map((n) => (
@@ -73,7 +73,7 @@ function Sidebar() {
             to={n.to}
             className={({ isActive }) =>
               `group flex h-12 items-center gap-3 rounded-xl px-3 text-[14px] font-medium transition-colors ${
-                isActive ? 'bg-raised text-ink shadow-[inset_3px_0_0_0_#FFCD11]' : 'text-ink3 hover:bg-panel hover:text-ink2'
+                isActive ? 'bg-cat-black text-[#FFCD11] shadow-sm' : 'text-cat-ink/75 hover:bg-black/10 hover:text-cat-ink'
               }`
             }
           >
@@ -91,7 +91,7 @@ function MobileNav() {
   const badges = useBadges()
   const NAV = useNav()
   return (
-    <nav className="no-print fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-line bg-[#0C0F13]/95 backdrop-blur lg:hidden">
+    <nav className="no-print fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t-2 border-cat bg-panel/95 backdrop-blur lg:hidden">
       {NAV.map((n) => (
         <NavLink key={n.to} to={n.to}
           className={({ isActive }) => `relative flex min-w-[76px] flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-semibold ${isActive ? 'text-cat' : 'text-ink3'}`}>
@@ -127,9 +127,9 @@ function TopBar() {
   const { pathname } = useLocation()
   const sh = state?.shift || {}
   return (
-    <header className="no-print sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur-md">
+    <header className="no-print sticky top-0 z-30 border-b border-line bg-panel/90 backdrop-blur-md">
       <div className="flex h-16 items-center gap-4 px-4 md:px-6">
-        <div className="lg:hidden"><svg viewBox="0 0 32 32" className="h-8 w-8"><path d="M16 2l12 7v14l-12 7-12-7V9z" fill="#FFCD11" /><path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="#0A0C0F" /></svg></div>
+        <div className="lg:hidden"><svg viewBox="0 0 32 32" className="h-8 w-8"><path d="M16 2l12 7v14l-12 7-12-7V9z" fill="#FFCD11" /><path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="#1A1814" /></svg></div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-[15px] font-semibold text-ink">{TITLES[pathname] || 'Operator Copilot'}</div>
           <div className="truncate text-2xs text-ink3">
@@ -170,7 +170,7 @@ function AlertBar() {
   if (!active || !h || pathname === '/dashboard') return null
   const crit = h.id === 'prox' || h.facts?.level === 'CRITICAL'
   const Icon = crit ? OctagonAlert : TriangleAlert
-  const cls = crit ? 'bg-crit text-white' : h.source === 'safety' ? 'bg-warn text-[#1f1000]' : 'bg-raised text-ink'
+  const cls = crit ? 'bg-crit text-white' : h.source === 'safety' ? 'bg-warn text-white' : 'bg-raised text-ink'
   const n = state.alerts.quiet_count || 0
   return (
     <div className={`flex items-center gap-3 px-4 md:px-6 py-2.5 text-sm font-semibold animate-rise ${cls}`}>

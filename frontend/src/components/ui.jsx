@@ -117,7 +117,7 @@ export function Segmented({ options, value, onChange, size = 'md' }) {
           onClick={() => onChange(o.value)}
           disabled={o.disabled}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 font-semibold transition-all ${h} disabled:opacity-40 ${
-            value === o.value ? 'bg-raised text-ink shadow-[0_0_0_1px_#2E3540]' : 'text-ink3 hover:text-ink2'
+            value === o.value ? 'bg-cat text-cat-ink shadow-[0_1px_2px_rgba(26,20,0,0.18)]' : 'text-ink3 hover:text-ink2'
           }`}
         >
           {o.icon && <o.icon size={15} />} {o.label}
@@ -136,7 +136,7 @@ export function Toggle({ checked, onChange, label, sub, tone = 'safe' }) {
         {sub && <div className="text-2xs text-ink3">{sub}</div>}
       </div>
       <span className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${checked ? on : 'bg-line2'}`}>
-        <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${checked ? 'left-6' : 'left-1'}`} />
+        <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${checked ? 'left-6' : 'left-1'}`} />
       </span>
     </button>
   )

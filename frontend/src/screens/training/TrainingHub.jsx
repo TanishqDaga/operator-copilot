@@ -23,8 +23,8 @@ function TrainingTabs() {
           className={({ isActive }) =>
             `inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-150 ${
               isActive
-                ? 'border-cat/50 bg-cat/10 text-cat shadow-[0_0_0_1px_rgba(255,205,17,0.2)]'
-                : 'border-line2 bg-raised text-ink2 hover:border-line2 hover:bg-[#20262e] hover:text-ink'
+                ? 'border-cat bg-cat text-cat-ink shadow-sm'
+                : 'border-line2 bg-raised text-ink2 hover:border-line2 hover:bg-raised hover:text-ink'
             }`
           }
         >

@@ -15,7 +15,7 @@ export function SensitivityChips({ profile, className = '' }) {
         const tone = { low: 'border-safe/30 text-safe', medium: 'border-warn/40 text-warn', high: 'border-crit/50 text-crit' }[profile[f]]
         return (
           <span key={f} title={`${f} sensitivity: ${profile[f]}`}
-            className={`inline-flex items-center gap-1 rounded-md border bg-black/20 px-1.5 py-0.5 text-2xs font-semibold ${tone}`}>
+            className={`inline-flex items-center gap-1 rounded-md border bg-panel/70 px-1.5 py-0.5 text-2xs font-semibold ${tone}`}>
             <Icon size={11} /> {LEVEL_SHORT[profile[f]]}
           </span>
         )
