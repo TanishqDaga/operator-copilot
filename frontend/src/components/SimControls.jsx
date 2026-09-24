@@ -78,15 +78,15 @@ export function PersonControls({ showCamera = true }) {
 }
 
 export function CameraView() {
-  const { stream, result, error, fps } = useCamera()
-  const { meta, state } = useApp()
+  const { stream, result, error } = useCamera()
+  const { state } = useApp()
   const ref = useRef(null)
   useEffect(() => {
     if (ref.current && stream) { ref.current.srcObject = stream; ref.current.play().catch(() => {}) }
   }, [stream])
   return (
     <div>
-      <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-line2 bg-black">
+      <div className="relative aspect-video max-h-44 overflow-hidden rounded-xl border border-line2 bg-black">
         {stream ? <video ref={ref} muted playsInline className="h-full w-full object-cover" /> : (
           <div className="grid h-full place-items-center text-sm text-ink3">{error || 'Starting camera…'}</div>
         )}
@@ -104,10 +104,6 @@ export function CameraView() {
         <Mini label="Box height" value={result?.h_ratio != null ? `${Math.round(result.h_ratio * 100)}%` : '—'} />
         <Mini label="Approach" value={result?.detected ? `${fmt(result.approach_ms, 2)} m/s` : '—'} />
       </div>
-      <p className="mt-2 text-2xs leading-4 text-ink3">
-        YOLOv8n (pretrained, person class only) · {fmt(fps, 1)} fps · {result?.infer_ms ?? '—'} ms/frame. Distance = K / box-height with K = {meta?.vision?.K} chosen by eye —
-        an <span className="text-ink2">uncalibrated proxy, not a measured range</span>. A growing box reads as approaching.
-      </p>
     </div>
   )
 }

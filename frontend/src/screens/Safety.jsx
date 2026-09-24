@@ -27,7 +27,7 @@ function SafetyView() {
   return (
         <div className="space-y-5">
           <SafetyBanner state={state} variant="hero" />
-          <div className="grid gap-5 xl:grid-cols-3">
+          <div className="grid items-start gap-5 xl:grid-cols-3">
             <Card className="xl:col-span-2">
               <CardHeader icon={Crosshair} title="Proximity" subtitle="Time-to-contact = distance ÷ closing speed"
                 right={<Chip tone={p.source === 'camera' ? 'info' : 'default'}>Source: {p.source}</Chip>} />
