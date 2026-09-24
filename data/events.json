@@ -1,10 +1,562 @@
 [
  {
   "id": 1,
-  "ts": "02:56:01",
+  "ts": "10:02:02",
   "kind": "shift",
   "level": "INFO",
   "title": "Shift started \u2014 pre-start checklist complete (10/10)",
-  "detail": "D. Tanaka on CAT320-042 \u00b7 running published schedule SCH-0002 (T3 \u2192 T1 \u2192 T2 \u2192 T4 \u2192 T5)"
+  "detail": "D. Tanaka on CAT320-042 \u00b7 running no published schedule \u2014 manager's original order (T1 \u2192 T2 \u2192 T3 \u2192 T4 \u2192 T5)"
+ },
+ {
+  "id": 2,
+  "ts": "10:02:21",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 2.8 m away \u2014 inside the critical zone (< 4 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 2.8 m away \u2014 inside the critical zone (< 4 m)"
+  ],
+  "distance_m": 2.8,
+  "ttc_s": 28.2,
+  "source": "camera",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close"
+   ],
+   "distance_m": 2.8,
+   "ttc_s": 28.2,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 2.8 m from the machine, about 28.2 s to contact.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 3,
+  "ts": "10:02:29",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from CRITICAL",
+  "detail": null
+ },
+ {
+  "id": 4,
+  "ts": "10:02:45",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 2.3 m away \u2014 inside the critical zone (< 4 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 2.3 m away \u2014 inside the critical zone (< 4 m)"
+  ],
+  "distance_m": 2.3,
+  "ttc_s": 23.2,
+  "source": "camera",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close"
+   ],
+   "distance_m": 2.3,
+   "ttc_s": 23.2,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 2.3 m from the machine, about 23.2 s to contact.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 5,
+  "ts": "10:02:56",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from CRITICAL",
+  "detail": null
+ },
+ {
+  "id": 6,
+  "ts": "10:03:42",
+  "kind": "safety",
+  "level": "WARNING",
+  "title": "WARNING: Person 4.9 m away \u2014 inside the warning zone (< 8 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 4.9 m away \u2014 inside the warning zone (< 8 m)"
+  ],
+  "distance_m": 4.9,
+  "ttc_s": 4.4,
+  "source": "camera",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "WARNING",
+   "reasons": [
+    "person_close"
+   ],
+   "distance_m": 4.9,
+   "ttc_s": 4.4,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Slow down and locate the person \u2014 they are 4.9 m away, inside the 8 m warning zone.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 7,
+  "ts": "10:03:51",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 4.0 m away \u2014 inside the critical zone (< 4 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 4.0 m away \u2014 inside the critical zone (< 4 m)"
+  ],
+  "distance_m": 4.0,
+  "ttc_s": 39.8,
+  "source": "camera",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close"
+   ],
+   "distance_m": 4.0,
+   "ttc_s": 39.8,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 4 m from the machine, about 39.8 s to contact.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 8,
+  "ts": "10:04:03",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from CRITICAL",
+  "detail": null
+ },
+ {
+  "id": 9,
+  "ts": "10:04:09",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 3.6 m away \u2014 inside the critical zone (< 4 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 3.6 m away \u2014 inside the critical zone (< 4 m)"
+  ],
+  "distance_m": 3.6,
+  "ttc_s": 4.0,
+  "source": "camera",
+  "speed_kmh": 3.2,
+  "weather": "clear",
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close"
+   ],
+   "distance_m": 3.6,
+   "ttc_s": 4.0,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 3.6 m from the machine, about 4 s to contact.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 10,
+  "ts": "10:04:17",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from CRITICAL",
+  "detail": null
+ },
+ {
+  "id": 11,
+  "ts": "10:04:28",
+  "kind": "safety",
+  "level": "WARNING",
+  "title": "WARNING: Person 5.1 m away \u2014 inside the warning zone (< 8 m)",
+  "detail": null,
+  "reasons": [
+   "person_close"
+  ],
+  "details": [
+   "Person 5.1 m away \u2014 inside the warning zone (< 8 m)"
+  ],
+  "distance_m": 5.1,
+  "ttc_s": 51.0,
+  "source": "camera",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "WARNING",
+   "reasons": [
+    "person_close"
+   ],
+   "distance_m": 5.1,
+   "ttc_s": 51.0,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Slow down and locate the person \u2014 they are 5.1 m away, inside the 8 m warning zone.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 12,
+  "ts": "10:04:38",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from WARNING",
+  "detail": null
+ },
+ {
+  "id": 13,
+  "ts": "10:04:59",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Rule alerts when the machine moves with the belt unfastened"
+ },
+ {
+  "id": 14,
+  "ts": "10:05:13",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt fastened",
+  "detail": null
+ },
+ {
+  "id": 15,
+  "ts": "10:20:59",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Five-signal demo: worker approaching, seatbelt off, idle, task delay, training nudge",
+  "detail": "Cab shows one headline; the rest are logged quietly"
+ },
+ {
+  "id": 16,
+  "ts": "10:20:59",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Live warning \u2014 product score keeps it below an approaching worker"
+ },
+ {
+  "id": 17,
+  "ts": "10:20:59",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 2.0 m away \u2014 inside the critical zone (< 4 m), Time-to-contact 1.4 s at 1.5 m/s closing \u2014 below the 2 s critical limit",
+  "detail": null,
+  "reasons": [
+   "person_close",
+   "ttc_low"
+  ],
+  "details": [
+   "Person 2.0 m away \u2014 inside the critical zone (< 4 m)",
+   "Time-to-contact 1.4 s at 1.5 m/s closing \u2014 below the 2 s critical limit"
+  ],
+  "distance_m": 2.0,
+  "ttc_s": 1.4,
+  "source": "slider",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close",
+    "ttc_low"
+   ],
+   "distance_m": 2.0,
+   "ttc_s": 1.4,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 2 m from the machine, about 1.4 s to contact.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 18,
+  "ts": "10:21:01",
+  "kind": "anomaly",
+  "level": "ANOMALY",
+  "title": "Idle duration unusual: 15 min vs your usual 4 min",
+  "detail": "Possible causes (not confirmed): Material or haul truck not available; Obstruction or blocked work face; Operator delay (radio call, break, paperwork)",
+  "anomaly_type": "excess_idle",
+  "current": 15.0,
+  "baseline": 4.0,
+  "unit": "min",
+  "score": -0.557,
+  "threshold": -0.54,
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close",
+    "ttc_low"
+   ],
+   "distance_m": 2.0,
+   "ttc_s": 1.4,
+   "anomaly": "excess_idle",
+   "idle_min": 15,
+   "baseline_idle_min": 4,
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 2 m from the machine, about 1.4 s to contact. Idle has run 15 min against your usual 4 min \u2014 check whether a truck, obstruction or delay is holding you up.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 19,
+  "ts": "10:21:03",
+  "kind": "eta",
+  "level": "INFO",
+  "title": "ETA T1 changed by +15 min",
+  "detail": "Machine idle 15 min \u2014 no material moved, finish moves out by the idle time",
+  "task_id": "T1",
+  "changed_by": 15
+ },
+ {
+  "id": 20,
+  "ts": "10:21:03",
+  "kind": "training",
+  "level": "INFO",
+  "title": "Training nudge \u2014 blind-zone awareness",
+  "detail": "Logged quietly; not shown in the cab while a person is in the path"
+ },
+ {
+  "id": 21,
+  "ts": "10:36:09",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Five-signal demo: worker approaching, seatbelt off, idle, task delay, training nudge",
+  "detail": "Cab shows one headline; the rest are logged quietly"
+ },
+ {
+  "id": 22,
+  "ts": "10:36:09",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Live warning \u2014 product score keeps it below an approaching worker"
+ },
+ {
+  "id": 23,
+  "ts": "10:36:12",
+  "kind": "training",
+  "level": "INFO",
+  "title": "Training nudge \u2014 blind-zone awareness",
+  "detail": "Logged quietly; not shown in the cab while a person is in the path"
+ },
+ {
+  "id": 24,
+  "ts": "10:36:28",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from CRITICAL",
+  "detail": null
+ },
+ {
+  "id": 25,
+  "ts": "10:51:50",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Five-signal demo: worker approaching, seatbelt off, idle, task delay, training nudge",
+  "detail": "Cab shows one headline; the rest are logged quietly"
+ },
+ {
+  "id": 26,
+  "ts": "10:51:50",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Live warning \u2014 product score keeps it below an approaching worker"
+ },
+ {
+  "id": 27,
+  "ts": "10:51:50",
+  "kind": "safety",
+  "level": "CRITICAL",
+  "title": "CRITICAL: Person 2.0 m away \u2014 inside the critical zone (< 4 m), Time-to-contact 1.4 s at 1.5 m/s closing \u2014 below the 2 s critical limit",
+  "detail": null,
+  "reasons": [
+   "person_close",
+   "ttc_low"
+  ],
+  "details": [
+   "Person 2.0 m away \u2014 inside the critical zone (< 4 m)",
+   "Time-to-contact 1.4 s at 1.5 m/s closing \u2014 below the 2 s critical limit"
+  ],
+  "distance_m": 2.0,
+  "ttc_s": 1.4,
+  "source": "slider",
+  "speed_kmh": 0.0,
+  "weather": "clear",
+  "context": {
+   "risk": "CRITICAL",
+   "reasons": [
+    "person_close",
+    "ttc_low"
+   ],
+   "distance_m": 2.0,
+   "ttc_s": 1.4,
+   "anomaly": "excess_idle",
+   "idle_min": 31,
+   "baseline_idle_min": 4,
+   "eta_change_min": 31,
+   "eta_change_reason": "Machine idle 31 min \u2014 no material moved, finish moves out by the idle time",
+   "limits": {
+    "warn_distance_m": 8.0,
+    "critical_distance_m": 4.0,
+    "warn_ttc_s": 4.0,
+    "critical_ttc_s": 2.0,
+    "wet_speed_limit_kmh": 1.5
+   }
+  },
+  "explanation": "Stop all movement now \u2014 a person is 2 m from the machine, about 1.4 s to contact. Idle has run 31 min against your usual 4 min \u2014 check whether a truck, obstruction or delay is holding you up. Task ETA has moved +31 min.",
+  "explanation_source": "template"
+ },
+ {
+  "id": 28,
+  "ts": "10:52:18",
+  "kind": "training",
+  "level": "INFO",
+  "title": "Training nudge \u2014 blind-zone awareness",
+  "detail": "Logged quietly; not shown in the cab while a person is in the path"
+ },
+ {
+  "id": 29,
+  "ts": "11:07:30",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Five-signal demo: worker approaching, seatbelt off, idle, task delay, training nudge",
+  "detail": "Cab shows one headline; the rest are logged quietly"
+ },
+ {
+  "id": 30,
+  "ts": "11:07:30",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Live warning \u2014 product score keeps it below an approaching worker"
+ },
+ {
+  "id": 31,
+  "ts": "11:07:44",
+  "kind": "training",
+  "level": "INFO",
+  "title": "Training nudge \u2014 blind-zone awareness",
+  "detail": "Logged quietly; not shown in the cab while a person is in the path"
+ },
+ {
+  "id": 32,
+  "ts": "11:22:44",
+  "kind": "sim",
+  "level": "INFO",
+  "title": "Five-signal demo: worker approaching, seatbelt off, idle, task delay, training nudge",
+  "detail": "Cab shows one headline; the rest are logged quietly"
+ },
+ {
+  "id": 33,
+  "ts": "11:22:44",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Live warning \u2014 product score keeps it below an approaching worker"
+ },
+ {
+  "id": 34,
+  "ts": "11:22:57",
+  "kind": "training",
+  "level": "INFO",
+  "title": "Training nudge \u2014 blind-zone awareness",
+  "detail": "Logged quietly; not shown in the cab while a person is in the path"
+ },
+ {
+  "id": 35,
+  "ts": "11:23:16",
+  "kind": "safety",
+  "level": "SAFE",
+  "title": "Cleared \u2014 back to SAFE from CRITICAL",
+  "detail": null
+ },
+ {
+  "id": 36,
+  "ts": "12:25:59",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt fastened",
+  "detail": null
+ },
+ {
+  "id": 37,
+  "ts": "12:26:09",
+  "kind": "seatbelt",
+  "level": "INFO",
+  "title": "Seatbelt unfastened",
+  "detail": "Rule alerts when the machine moves with the belt unfastened"
  }
 ]

@@ -149,7 +149,7 @@ function ModuleCard({ m, reason, count, onBook, booked }) {
         <Chip tone="cat"><span className="num">{count}</span> event{count === 1 ? '' : 's'}</Chip>
       </div>
 
-      <div className="mt-4 rounded-xl border border-line bg-black/20 px-3 py-2.5">
+      <div className="mt-4 rounded-xl border border-line bg-panel2 px-3 py-2.5">
         <div className="label">Why you're seeing this</div>
         <div className="mt-1 text-sm font-medium text-ink">{reason}</div>
       </div>
